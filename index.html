@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>migrain</title>
+    <script src="https://unpkg.com/tunajs/tuna.js"></script>
+    <style>
+        :root {
+            --light-bg: #ffffff;
+            --light-surface: #f1f3f4;
+            --light-text: #202124;
+            --light-text-secondary: #5f6368;
+            --light-outline: #dadce0;
+            --light-accent: #1a73e8;
+            --light-record: #d93025;
+
+            --dark-bg: #202124;
+            --dark-surface: #303134;
+            --dark-text: #e8eaed;
+            --dark-text-secondary: #9aa0a6;
+            --dark-outline: #5f6368;
+            --dark-accent: #8ab4f8;
+            --dark-record: #f28b82;
+
+            --bg: var(--dark-bg);
+            --surface: var(--dark-surface);
+            --text: var(--dark-text);
+            --text-secondary: var(--dark-text-secondary);
+            --outline: var(--dark-outline);
+            --accent: var(--dark-accent);
+            --record: var(--dark-record);
+        }
+
+        body[data-theme="light"] {
+            --bg: var(--light-bg);
+            --surface: var(--light-surface);
+            --text: var(--light-text);
+            --text-secondary: var(--light-text-secondary);
+            --outline: var(--light-outline);
+            --accent: var(--light-accent);
+            --record: var(--light-record);
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex-direction: column;
+            padding-top: 2vh;
+            margin: 0;
+            height: 100vh;
+            touch-action: none;
+            transition: background-color 0.3s, color 0.3s;
+            overflow: hidden;
+        }
+
+        .container-wrapper {
+            position: relative;
+            width: 95%;
+            max-width: 600px;
+            margin-top: 180px;
+        }
+
+        .container {
+            background-color: var(--surface);
+            border-radius: 12px;
+            padding: 35px;
+            border: 1px solid var(--outline);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: calc(100vh - 374px);
+            overflow-y: auto;
+            transition: background-color 0.3s, border-color 0.3s;
+            scrollbar-width: none;
+        }
+        .container::-webkit-scrollbar {
+            display: none;
+        }
+
+        #custom-scrollbar {
+            position: absolute;
+            top: 0;
+            right: 5px;
+            width: 15px;
+            height: 96%;
+            padding: 10px 0;
+        }
+
+        #scrollbar-thumb {
+            width: 100%;
+            background-color: var(--accent);
+            border-radius: 4px;
+            position: relative;
+            cursor: grab;
+        }
+        #scrollbar-thumb:active {
+            cursor: grabbing;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+        
+        .effect-group h2 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .effect-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 2vh;
+            left: 50%;
+            transform: translate(-50%, 0);
+            width: 90%;
+            max-width: 580px;
+            border: 1px solid var(--outline);
+            border-radius: 8px;
+            background-color: var(--surface);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+
+        #canvas-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px 8px 0 0;
+        }
+
+        #waveform-canvas {
+            width: 100%;
+            height: 120px;
+            background-color: var(--bg);
+            cursor: crosshair;
+            display: block;
+        }
+
+        #drag-handle-rect {
+            width: 40px;
+            height: 10px;
+            background-color: var(--accent);
+            border-radius: 6px;
+            position: absolute;
+            bottom: -17px;
+            left: 50%;
+            transform: translateX(-50%);
+            cursor: grab;
+            z-index: 10;
+            border: none;
+        }
+        #drag-handle-rect:active { cursor: grabbing; }
+
+        #play-indicator-v, #play-indicator-h {
+            position: absolute;
+            background-color: var(--record);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.1s;
+        }
+        #play-indicator-v { width: 2px; height: 120px; top: 0; }
+        #play-indicator-h { height: 2px; width: 100%; left: 0; }
+
+        #instructions {
+            text-align: center;
+            color: var(--text-secondary);
+            min-height: 1.2em;
+            font-size: 0.9rem;
+            margin: 0;
+            padding: 5px;
+            border-top: 1px solid var(--outline);
+            border-radius: 0 0 8px 8px;
+        }
+
+        .effect-controls {
+            display: grid;
+            gap: 20px 15px;
+            padding-top: 10px;
+            border-top: 1px solid var(--outline);
+            margin-top: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            justify-items: center;
+        }
+
+        .control {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .control label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .knob-container {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            cursor: ew-resize;
+        }
+
+        .knob-container svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(135deg);
+        }
+
+        .knob-track, .knob-fill {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+        }
+
+        .knob-track { stroke: var(--outline); }
+        .knob-fill { stroke: var(--accent); }
+
+        .square-slider-container {
+            width: 40px;
+            height: 24px;
+            background-color: var(--outline);
+            position: relative;
+            cursor: pointer;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .square-slider-fill {
+            background-color: var(--accent);
+            width: 100%;
+            height: 100%;
+            transform-origin: left;
+            transform: scaleX(0);
+        }
+
+        .square-slider-container[data-checked="true"] .square-slider-fill {
+            transform: scaleX(1);
+        }
+
+        .bottom-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 600px;
+            z-index: 50;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 15px;
+            background-color: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: 12px;
+        }
+
+        button, .file-upload-wrapper label {
+            background-color: transparent;
+            color: var(--text);
+            border: 1px solid var(--outline);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.2s, border-color 0.2s;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .file-upload-wrapper { display: flex; }
+        button:hover, .file-upload-wrapper label:hover { background-color: var(--outline); }
+        #record-btn.recording { background-color: var(--record); color: var(--bg); border-color: var(--record); }
+        input[type="file"] { display: none; }
+
+        .impulse-control {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 10px;
+        }
+        .impulse-control input {
+            flex-grow: 1;
+            background-color: var(--bg);
+            border: 1px solid var(--outline);
+            color: var(--text);
+            border-radius: 4px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div id="canvas-container">
+        <div id="canvas-wrapper">
+            <canvas id="waveform-canvas"></canvas>
+            <div id="play-indicator-v"></div>
+            <div id="play-indicator-h"></div>
+        </div>
+        <p id="instructions">Upload an audio file to begin.</p>
+        <div id="drag-handle-rect"></div>
+    </div>
+
+    <div class="container-wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>migrain</h1>
+                <div class="square-slider-container" data-id="theme-toggle" data-checked="false" data-default-checked="false">
+                    <div class="square-slider-fill"></div>
+                </div>
+            </div>
+
+            <div class="effect-group" data-effect="granular">
+                <div class="effect-header">
+                    <h2>Granular</h2>
+                    <div class="square-slider-container group-toggle" data-checked="true" data-default-checked="true">
+                        <div class="square-slider-fill"></div>
+                    </div>
+                </div>
+                <div class="effect-controls">
+                    <div class="control"><label>Size</label><div class="knob-container" data-id="grain-size" data-min="10" data-max="500" data-value="100"></div></div>
+                    <div class="control"><label>Density</label><div class="knob-container" data-id="grain-density" data-min="1" data-max="100" data-value="20"></div></div>
+                    <div class="control"><label>Pitch</label><div class="knob-container" data-id="pitch" data-min="0.1" data-max="4.0" data-value="1.0" data-step="0.01"></div></div>
+                    <div class="control"><label>Pitch Jitter</label><div class="knob-container" data-id="pitch-jitter" data-min="0" data-max="1" data-value="0" data-step="0.01"></div></div>
+                    <div class="control"><label>Grain Jitter</label><div class="knob-container" data-id="grain-jitter" data-min="0" data-max="1000" data-value="0" data-step="1"></div></div>
+                    <div class="control"><label>Pan Jitter</label><div class="knob-container" data-id="spread" data-min="0" data-max="1" data-value="0.1" data-step="0.01"></div></div>
+                    <div class="control"><label>Pan</label><div class="knob-container" data-id="pan" data-min="-1" data-max="1" data-value="0" data-step="0.01"></div></div>
+                    <div class="control"><label>Reverse</label><div class="knob-container" data-id="reverse-chance" data-min="0" data-max="1" data-value="0" data-step="0.01"></div></div>
+                    <div class="control"><label>Density Jitter</label><div class="knob-container" data-id="density-jitter" data-min="0" data-max="0.1" data-value="0" data-step="0.001"></div></div>
+                    <div class="control"><label>Noise</label><div class="knob-container" data-id="noise-amount" data-min="0" data-max="0.2" data-value="0" data-step="0.001"></div></div>
+                    <div class="control"><label>Gain</label><div class="knob-container" data-id="granular-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
+                    <div class="control"><label>Pitch Sync</label><div class="square-slider-container" data-id="pitch-sync" data-checked="false" data-default-checked="false"> <div class="square-slider-fill"></div></div></div>
+                </div>
+            </div>
+
+            <div class="effect-group" data-effect="compressor">
+                <div class="effect-header">
+                    <h2>Compressor</h2>
+                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div>
+                </div>
+                <div class="effect-controls" style="display: none;">
+                    <div class="control"><label>Threshold</label><div class="knob-container" data-id="comp-threshold" data-min="-100" data-max="0" data-value="-24"></div></div>
+                    <div class="control"><label>Ratio</label><div class="knob-container" data-id="comp-ratio" data-min="1" data-max="20" data-value="4"></div></div>
+                    <div class="control"><label>Knee</label><div class="knob-container" data-id="comp-knee" data-min="0" data-max="40" data-value="30"></div></div>
+                    <div class="control"><label>Attack</label><div class="knob-container" data-id="comp-attack" data-min="0" data-max="1" data-value="0.003" data-step="0.001"></div></div>
+                    <div class="control"><label>Release</label><div class="knob-container" data-id="comp-release" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div></div>
+                    <div class="control"><label>Makeup</label><div class="knob-container" data-id="comp-makeupGain" data-min="0" data-max="20" data-value="1"></div></div>
+                    <div class="control"><label>Gain</label><div class="knob-container" data-id="compressor-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
+                    <div class="control"><label>Auto Makeup</label><div class="square-slider-container" data-id="comp-automakeup" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div></div>
+                </div>
+            </div>
+
+            <div class="effect-group" data-effect="overdrive">
+                <div class="effect-header">
+                    <h2>Overdrive</h2>
+                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div>
+                </div>
+                <div class="effect-controls" style="display: none;">
+                    <div class="control"><label>Drive</label><div class="knob-container" data-id="overdrive-drive" data-min="0" data-max="1" data-value="0.5" data-step="0.01"></div></div>
+                    <div class="control"><label>Output</label><div class="knob-container" data-id="overdrive-outputGain" data-min="0" data-max="1" data-value="0.5" data-step="0.01"></div></div>
+                    <div class="control"><label>Curve</label><div class="knob-container" data-id="overdrive-curveAmount" data-min="0" data-max="1" data-value="1" data-step="0.01"></div></div>
+                    <div class="control"><label>Algorithm</label><div class="knob-container" data-id="overdrive-algorithmIndex" data-min="0" data-max="5" data-value="0" data-step="1"></div></div>
+                    <div class="control"><label>Gain</label><div class="knob-container" data-id="overdrive-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
+                </div>
+            </div>
+
+            <div class="effect-group" data-effect="chorus">
+                <div class="effect-header">
+                    <h2>Chorus</h2>
+                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div>
+                </div>
+                <div class="effect-controls" style="display: none;">
+                    <div class="control"><label>Rate</label><div class="knob-container" data-id="chorus-rate" data-min="0.01" data-max="8" data-value="1.5" data-step="0.01"></div></div>
+                    <div class="control"><label>Depth</label><div class="knob-container" data-id="chorus-depth" data-min="0" data-max="1" data-value="0.7" data-step="0.01"></div></div>
+                    <div class="control"><label>Feedback</label><div class="knob-container" data-id="chorus-feedback" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div></div>
+                    <div class="control"><label>Delay</label><div class="knob-container" data-id="chorus-delay" data-min="0" data-max="0.1" data-value="0.0045" data-step="0.0001"></div></div>
+                    <div class="control"><label>Gain</label><div class="knob-container" data-id="chorus-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
+                </div>
+            </div>
+
+            <div class="effect-group" data-effect="phaser">
+                <div class="effect-header">
+                    <h2>Phaser</h2>
+                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div>
+                </div>
+                <div class="effect-controls" style="display: none;">
+                    <div class="control"><label>Rate</label><div class="knob-container" data-id="phaser-rate" data-min="0.01" data-max="8" data-value="1.2" data-step="0.01"></div></div>
+                    <div class="control"><label>Depth</label><div class="knob-container" data-id="phaser-depth" data-min="0" data-max="1" data-value="0.3" data-step="0.01"></div></div>
+                    <div class="control"><label>Feedback</label><div class="knob-container" data-id="phaser-feedback" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div></div>
+                    <div class="control"><label>Phase</label><div class="knob-container" data-id="phaser-stereoPhase" data-min="0" data-max="180" data-value="30" data-step="1"></div></div>
+                    <div class="control"><label>Base Freq</label><div class="knob-container" data-id="phaser-baseModulationFrequency" data-min="500" data-max="1500" data-value="700" data-step="1"></div></div>
+                    <div class="control"><label>Gain</label><div class="knob-container" data-id="phaser-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
+                </div>
+            </div>
+
+            <div class="effect-group" data-effect="tremolo">
+                <div class="effect-header">
+                    <h2>Tremolo</h2>
+                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div>
+                </div>
+                <div class="effect-controls" style="display: none;">
+                    <div class="control"><label>Intensity</label><div class="knob-container" data-id="tremolo-intensity" data-min="0" data-max="1" data-value="0.3" data-step="0.01"></div></div>
+                    <div class="control"><label>Rate</label><div class="knob-container" data-id="tremolo-rate" data-min="0.01" data-max="8" data-value="5" data-step="0.01"></div></div>
+                    <div class="control"><label>Phase</label><div class="knob-container" data-id="tremolo-stereoPhase" data-min="0" data-max="180" data-value="0" data-step="1"></div></div>
+                    <div class="control"><label>Gain</label><div class="knob-container" data-id="tremolo-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
+                </div>
+            </div>
+
+            <div class="effect-group" data-effect="delay">
+                <div class="effect-header">
+                    <h2>Delay</h2>
+                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div>
+                </div>
+                <div class="effect-controls" style="display: none;">
+                    <div class="control"><label>Time</label><div class="knob-container" data-id="delay-time" data-min="1" data-max="2000" data-value="350" step="1"></div></div>
+                    <div class="control"><label>Feedback</label><div class="knob-container" data-id="delay-feedback" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div></div>
+                    <div class="control"><label>Cutoff</label><div class="knob-container" data-id="delay-cutoff" data-min="20" data-max="20000" data-value="2000" step="1"></div></div>
+                    <div class="control"><label>Mix</label><div class="knob-container" data-id="delay-mix" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div></div>
+                    <div class="control"><label>Gain</label><div class="knob-container" data-id="delay-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
+                    <div class="control" style="grid-column: 1 / -1; width: 100%;">
+                        <button id="stop-delay-btn">Stop Sound</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="effect-group" data-effect="reverb">
+                <div class="effect-header">
+                    <h2>Reverb</h2>
+                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div>
+                </div>
+                <div class="effect-controls" style="display: none;">
+                    <div class="control"><label>Dry</label><div class="knob-container" data-id="reverb-dryLevel" data-min="0" data-max="1" data-value="1" data-step="0.01"></div></div>
+                    <div class="control"><label>Wet</label><div class="knob-container" data-id="reverb-wetLevel" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div></div>
+                    <div class="control"><label>Level</label><div class="knob-container" data-id="reverb-level" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
+                    <div class="control"><label>Damping</label><div class="knob-container" data-id="reverb-highCut" data-min="20" data-max="22050" data-value="22050" step="1"></div></div>
+                    <div class="control"><label>Low Cut</label><div class="knob-container" data-id="reverb-lowCut" data-min="20" data-max="22050" data-value="20" step="1"></div></div>
+                    <div class="control"><label>Gain</label><div class="knob-container" data-id="reverb-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
+                    <div class="impulse-control">
+                        <input type="text" id="reverb-impulse" value="https://raw.githubusercontent.com/Theodeus/tuna/master/impulses/impulse_rev.wav">
+                        <button id="load-reverb-impulse">Load</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="custom-scrollbar">
+            <div id="scrollbar-thumb"></div>
+        </div>
+    </div>
+
+    <div class="bottom-controls">
+        <div class="button-grid">
+            <div class="file-upload-wrapper">
+               <label for="audio-upload">Upload</label>
+               <input type="file" id="audio-upload" accept="audio/*">
+           </div>
+           <button id="record-btn">Record</button>
+           <button id="reset-btn">Reset All</button>
+       </div>
+    </div>
+
+    <script>
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const tuna = new Tuna(audioContext);
+        let audioBuffer = null;
+        let granularNode = null;
+        let filterNode = null;
+        let pannerNode = null;
+        let isPlaying = false;
+        let activeCanvasTouchId = null;
+
+        const fileUpload = document.getElementById('audio-upload');
+        const canvas = document.getElementById('waveform-canvas');
+        const ctx = canvas.getContext('2d');
+        const playIndicatorV = document.getElementById('play-indicator-v');
+        const playIndicatorH = document.getElementById('play-indicator-h');
+        const instructions = document.getElementById('instructions');
+        const resetBtn = document.getElementById('reset-btn');
+        
+        const recordBtn = document.getElementById('record-btn');
+        let isRecording = false;
+        let recorderNode = null;
+        let recordedData = [];
+
+        let effects = {};
+
+        const granularProcessorCode = `
+            class GranularProcessor extends AudioWorkletProcessor {
+                constructor() {
+                    super();
+                    this._buffers = [];
+                    this._lastGrainTime = 0;
+                    this.grains = [];
+                    this.port.onmessage = (event) => {
+                        if (event.data.buffers) {
+                            this._buffers = event.data.buffers;
+                        }
+                    };
+                }
+
+                static get parameterDescriptors() {
+                    return [
+                        { name: 'playing', defaultValue: 0, minValue: 0, maxValue: 1 },
+                        { name: 'playhead', defaultValue: 0, minValue: 0, maxValue: 1 },
+                        { name: 'grainSize', defaultValue: 100, minValue: 10, maxValue: 500 },
+                        { name: 'grainDensity', defaultValue: 20, minValue: 1, maxValue: 100 },
+                        { name: 'pitch', defaultValue: 1.0, minValue: 0.1, maxValue: 4.0 },
+                        { name: 'pitchJitter', defaultValue: 0, minValue: 0, maxValue: 1 },
+                        { name: 'grainJitter', defaultValue: 0, minValue: 0, maxValue: 1000 },
+                        { name: 'spread', defaultValue: 0.1, minValue: 0, maxValue: 1 },
+                        { name: 'pitchSync', defaultValue: 0, minValue: 0, maxValue: 1 },
+                        { name: 'reverseChance', defaultValue: 0, minValue: 0, maxValue: 1 },
+                        { name: 'densityJitter', defaultValue: 0, minValue: 0, maxValue: 0.1 },
+                        { name: 'noiseAmount', defaultValue: 0, minValue: 0, maxValue: 0.2 }
+                    ];
+                }
+
+                process(inputs, outputs, parameters) {
+                    const output = outputs[0];
+                    const channelCount = output.length;
+                    if (channelCount < 2) return true;
+
+                    const outputLength = output[0].length;
+
+                    if (parameters.playing[0] < 0.5 || this._buffers.length === 0) {
+                        for (let channel = 0; channel < channelCount; channel++) {
+                            output[channel].fill(0);
+                        }
+                        return true;
+                    }
+                    
+                    const densityJitterAmount = (Math.random() - 0.5) * parameters.densityJitter[0];
+                    const grainInterval = (1.0 / parameters.grainDensity[0]) + densityJitterAmount;
+
+                    if (currentTime > this._lastGrainTime + Math.max(0.001, grainInterval)) {
+                        this._lastGrainTime = currentTime;
+                        const grainSize = parameters.grainSize[0] / 1000;
+                        const grainSizeSamples = Math.round(grainSize * sampleRate);
+                        const bufferLength = this._buffers[0].length;
+                        
+                        const jitterAmount = (Math.random() * 2 - 1) * (parameters.grainJitter[0] / 10000.0) * bufferLength;
+                        let startPosition = Math.floor(parameters.playhead[0] * bufferLength + jitterAmount);
+                        startPosition = Math.max(0, Math.min(startPosition, bufferLength - grainSizeSamples));
+                        
+                        const grainBuffers = this._buffers.map(channelBuffer => 
+                            channelBuffer.subarray(startPosition, startPosition + grainSizeSamples)
+                        );
+                        
+                        const pitchRand = (Math.random() * 2 - 1) * parameters.pitchJitter[0];
+                        const finalPitch = parameters.pitch[0] + pitchRand;
+
+                        let totalDurationSamples;
+                        if (parameters.pitchSync[0] > 0.5) {
+                            totalDurationSamples = grainSizeSamples;
+                        } else {
+                            totalDurationSamples = Math.floor(grainSizeSamples / finalPitch);
+                        }
+
+                        const finalPan = (Math.random() * 2 - 1) * parameters.spread[0];
+
+                        this.grains.push({
+                            buffers: grainBuffers,
+                            playbackPosition: 0,
+                            pitch: finalPitch,
+                            totalDurationSamples: totalDurationSamples,
+                            pan: finalPan,
+                            direction: Math.random() < parameters.reverseChance[0] ? -1 : 1
+                        });
+                    }
+
+                    for (let i = 0; i < outputLength; i++) {
+                        let leftSample = 0;
+                        let rightSample = 0;
+
+                        for (const grain of this.grains) {
+                            const progress = grain.playbackPosition / grain.totalDurationSamples;
+                            if (progress >= 0 && progress < 1) {
+                                const envelope = 1 - Math.abs(2 * progress - 1);
+                                
+                                let readPosition;
+                                if (grain.direction === 1) {
+                                    readPosition = Math.floor(grain.playbackPosition * grain.pitch);
+                                } else {
+                                    readPosition = Math.floor((grain.totalDurationSamples - grain.playbackPosition) * grain.pitch);
+                                }
+
+                                if (readPosition >= 0 && readPosition < grain.buffers[0].length) {
+                                    const noise = (Math.random() * 2 - 1) * parameters.noiseAmount[0];
+                                    const grainSample = (grain.buffers[0][readPosition] + noise) * envelope;
+                                    
+                                    const panR = (grain.pan + 1) / 2;
+                                    const panL = 1 - panR;
+                                    leftSample += grainSample * panL;
+                                    rightSample += grainSample * panR;
+                                }
+                            }
+                        }
+                        output[0][i] = leftSample * 0.5;
+                        output[1][i] = rightSample * 0.5;
+
+                        for (let g = this.grains.length - 1; g >= 0; g--) {
+                            const grain = this.grains[g];
+                            grain.playbackPosition += 1;
+                            if (grain.playbackPosition >= grain.totalDurationSamples) {
+                                this.grains.splice(g, 1);
+                            }
+                        }
+                    }
+                    return true;
+                }
+            }
+            registerProcessor('granular-processor', GranularProcessor);
+        `;
+
+        async function setupAudioChain() {
+            try {
+                const blob = new Blob([granularProcessorCode], { type: 'application/javascript' });
+                const workletURL = URL.createObjectURL(blob);
+                await audioContext.audioWorklet.addModule(workletURL);
+                
+                granularNode = new AudioWorkletNode(audioContext, 'granular-processor', { outputChannelCount: [2] });
+                filterNode = audioContext.createBiquadFilter();
+                pannerNode = audioContext.createStereoPanner();
+
+                const effectConstructors = {
+                    granular: () => audioContext.createGain(),
+                    compressor: () => new tuna.Compressor({ bypass: true }),
+                    overdrive: () => new tuna.Overdrive({ bypass: true }),
+                    chorus: () => new tuna.Chorus({ bypass: true }),
+                    phaser: () => new tuna.Phaser({ bypass: true }),
+                    tremolo: () => new tuna.Tremolo({ bypass: true }),
+                    delay: () => new tuna.Delay({ bypass: true }),
+                    reverb: () => new tuna.Convolver({ impulse: document.getElementById('reverb-impulse').value, bypass: true })
+                };
+
+                const chain = [granularNode, filterNode, pannerNode];
+
+                document.querySelectorAll('.effect-group').forEach(group => {
+                    const effectName = group.dataset.effect;
+                    if (effectConstructors[effectName]) {
+                        const effect = effectConstructors[effectName]();
+                        effects[effectName] = effect;
+                        chain.push(effect);
+
+                        const gainNode = audioContext.createGain();
+                        effects[effectName + 'Gain'] = gainNode;
+                        chain.push(gainNode);
+                    }
+                });
+                
+                effects.masterGain = audioContext.createGain();
+                chain.push(effects.masterGain);
+                chain.push(audioContext.destination);
+
+                for (let i = 0; i < chain.length - 1; i++) {
+                    chain[i].connect(chain[i+1]);
+                }
+
+            } catch (e) {
+                console.error("Error setting up audio chain:", e);
+                instructions.textContent = "Error: Browser not supported.";
+            }
+        }
+        
+        fileUpload.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            if(audioContext.state === 'suspended') audioContext.resume();
+
+            instructions.textContent = "Loading audio...";
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                
+                drawWaveform(audioBuffer);
+                if (granularNode) {
+                    const channels = [];
+                    for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
+                        channels.push(audioBuffer.getChannelData(i));
+                    }
+                    granularNode.port.postMessage({ buffers: channels });
+                }
+                instructions.textContent = "Drag on the waveform to play. Drag up/down to filter.";
+            } catch(e) {
+                alert("Error decoding audio file.");
+                instructions.textContent = "Failed to load audio.";
+            }
+        });
+        
+        function handleInteraction(event, touchObject) {
+            if (!audioBuffer || !granularNode) return;
+            
+            const interactionSource = touchObject || event;
+            const rect = canvas.getBoundingClientRect();
+            
+            const x = interactionSource.clientX - rect.left;
+            const y = interactionSource.clientY - rect.top;
+
+            const playheadPosition = Math.max(0, Math.min(1, x / rect.width));
+            granularNode.parameters.get('playhead').setValueAtTime(playheadPosition, audioContext.currentTime);
+            
+            const normalizedY = 1 - Math.max(0, Math.min(1, y / rect.height));
+            const minFreq = 40;
+            const maxFreq = 20000;
+            const logFreq = minFreq * Math.pow(maxFreq / minFreq, normalizedY);
+            if (filterNode) filterNode.frequency.setTargetAtTime(logFreq, audioContext.currentTime, 0.01);
+
+            updatePlayIndicator(x, y);
+        }
+        
+        function startPlayingMouse(e) {
+            if (e.target !== canvas || !audioBuffer) return;
+            audioContext.resume();
+            isPlaying = true;
+            granularNode.parameters.get('playing').setValueAtTime(1, audioContext.currentTime);
+            handleInteraction(e, null);
+        }
+
+        function handleCanvasTouchStart(e) {
+            if (e.target !== canvas || !audioBuffer) return;
+            e.preventDefault();
+            const soundControlTouch = e.changedTouches[0];
+            activeCanvasTouchId = soundControlTouch.identifier;
+
+            audioContext.resume();
+            isPlaying = true;
+            granularNode.parameters.get('playing').setValueAtTime(1, audioContext.currentTime);
+            
+            handleInteraction(e, soundControlTouch);
+        }
+
+        function handleCanvasTouchMove(e) {
+            if (!isPlaying || activeCanvasTouchId === null) return;
+            e.preventDefault();
+            for (const touch of e.changedTouches) {
+                if (touch.identifier === activeCanvasTouchId) {
+                    handleInteraction(e, touch);
+                    break;
+                }
+            }
+        }
+
+        function handleCanvasTouchEnd(e) {
+            if (activeCanvasTouchId === null) return;
+            for (const touch of e.changedTouches) {
+                if (touch.identifier === activeCanvasTouchId) {
+                    activeCanvasTouchId = null;
+                    stopPlaying();
+                    break;
+                }
+            }
+        }
+        
+        function stopPlaying() {
+            if (!isPlaying) return;
+            isPlaying = false;
+            granularNode.parameters.get('playing').setValueAtTime(0, audioContext.currentTime);
+            if (filterNode) filterNode.frequency.setTargetAtTime(20000, audioContext.currentTime, 0.01);
+            hidePlayIndicator();
+        }
+
+        canvas.addEventListener('mousedown', startPlayingMouse);
+        canvas.addEventListener('mousemove', (e) => isPlaying && activeCanvasTouchId === null && handleInteraction(e));
+        canvas.addEventListener('mouseup', stopPlaying);
+        canvas.addEventListener('mouseleave', stopPlaying);
+        canvas.addEventListener('touchstart', handleCanvasTouchStart, { passive: false });
+        canvas.addEventListener('touchmove', handleCanvasTouchMove, { passive: false });
+        canvas.addEventListener('touchend', handleCanvasTouchEnd);
+
+        const tunaMappings = {
+            'compThreshold': { node: 'compressor', param: 'threshold' },
+            'compRatio': { node: 'compressor', param: 'ratio' },
+            'compKnee': { node: 'compressor', param: 'knee' },
+            'compAttack': { node: 'compressor', param: 'attack' },
+            'compRelease': { node: 'compressor', param: 'release' },
+            'compMakeupGain': { node: 'compressor', param: 'makeupGain' },
+            'compAutomakeup': { node: 'compressor', param: 'automakeup', type: 'bool' },
+            'overdriveDrive': { node: 'overdrive', param: 'drive' },
+            'overdriveOutputGain': { node: 'overdrive', param: 'outputGain' },
+            'overdriveCurveAmount': { node: 'overdrive', param: 'curveAmount' },
+            'overdriveAlgorithmIndex': { node: 'overdrive', param: 'algorithmIndex' },
+            'chorusRate': { node: 'chorus', param: 'rate' },
+            'chorusDepth': { node: 'chorus', param: 'depth' },
+            'chorusFeedback': { node: 'chorus', param: 'feedback' },
+            'chorusDelay': { node: 'chorus', param: 'delay' },
+            'phaserRate': { node: 'phaser', param: 'rate' },
+            'phaserDepth': { node: 'phaser', param: 'depth' },
+            'phaserFeedback': { node: 'phaser', param: 'feedback' },
+            'phaserStereoPhase': { node: 'phaser', param: 'stereoPhase' },
+            'phaserBaseModulationFrequency': { node: 'phaser', param: 'baseModulationFrequency' },
+            'tremoloIntensity': { node: 'tremolo', param: 'intensity' },
+            'tremoloRate': { node: 'tremolo', param: 'rate' },
+            'tremoloStereoPhase': { node: 'tremolo', param: 'stereoPhase' },
+            'delayTime': { node: 'delay', param: 'delayTime' },
+            'delayFeedback': { node: 'delay', param: 'feedback' },
+            'delayCutoff': { node: 'delay', param: 'cutoff' },
+            'delayMix': { node: 'delay', param: 'wetLevel' },
+            'reverbWetLevel': { node: 'reverb', param: 'wetLevel' },
+            'reverbDryLevel': { node: 'reverb', param: 'dryLevel' },
+            'reverbLevel': { node: 'reverb', param: 'level' },
+            'reverbHighCut': { node: 'reverb', param: 'highCut' },
+            'reverbLowCut': { node: 'reverb', param: 'lowCut' }
+        };
+
+        function updateAudioParameter(id, value) {
+            if (!granularNode) return;
+            const paramName = id.replace(/-./g, x => x[1].toUpperCase());
+
+            if (granularNode.parameters.has(paramName)) {
+                granularNode.parameters.get(paramName).setTargetAtTime(value, audioContext.currentTime, 0.01);
+            } else if (paramName === 'pan' && pannerNode) {
+                pannerNode.pan.setTargetAtTime(value, audioContext.currentTime, 0.01);
+            } else if (paramName.endsWith('Gain')) {
+                const effectName = paramName.replace('Gain', '');
+                if (effects[effectName + 'Gain']) {
+                    effects[effectName + 'Gain'].gain.setTargetAtTime(value, audioContext.currentTime, 0.01);
+                }
+            } else {
+                const mapping = tunaMappings[paramName];
+                if (mapping && effects[mapping.node]) {
+                    effects[mapping.node][mapping.param] = value;
+                }
+            }
+        }
+
+        document.getElementById('load-reverb-impulse').addEventListener('click', () => {
+            const url = document.getElementById('reverb-impulse').value;
+            if (effects.reverb) effects.reverb.loadImpulse(url);
+        });
+
+        document.getElementById('stop-delay-btn').addEventListener('click', () => {
+            const feedbackKnob = document.querySelector('.knob-container[data-id="delay-feedback"]');
+            const mixKnob = document.querySelector('.knob-container[data-id="delay-mix"]');
+            if (feedbackKnob && feedbackKnob.setValue) {
+                feedbackKnob.setValue(0);
+            }
+            if (mixKnob && mixKnob.setValue) {
+                mixKnob.setValue(0);
+            }
+        });
+
+        recordBtn.addEventListener('click', toggleRecording);
+        
+        function drawWaveform(buffer) {
+            const data = buffer.getChannelData(0);
+            const step = Math.ceil(data.length / canvas.width);
+            const amp = canvas.height / 2;
+            const theme = document.body.getAttribute('data-theme');
+            const waveColor = theme === 'light' ? '#1a73e8' : '#8ab4f8';
+            const bgColor = theme === 'light' ? '#ffffff' : '#202124';
+
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = waveColor;
+            ctx.beginPath();
+
+            for (let i = 0; i < canvas.width; i++) {
+                let min = 1.0, max = -1.0;
+                for (let j = 0; j < step; j++) {
+                    const datum = data[(i * step) + j];
+                    if (datum < min) min = datum;
+                    if (datum > max) max = datum;
+                }
+                ctx.moveTo(i, (1 + min) * amp);
+                ctx.lineTo(i, (1 + max) * amp);
+            }
+            ctx.stroke();
+        }
+
+        function updatePlayIndicator(x, y) {
+            playIndicatorV.style.opacity = '1';
+            playIndicatorH.style.opacity = '1';
+            playIndicatorV.style.transform = `translateX(${Math.round(x)}px)`;
+            playIndicatorH.style.top = `${Math.round(y)}px`;
+        }
+
+        function hidePlayIndicator() {
+            playIndicatorV.style.opacity = '0';
+            playIndicatorH.style.opacity = '0';
+        }
+
+        function toggleRecording() {
+            if (isRecording) {
+                isRecording = false;
+                effects.masterGain.disconnect(recorderNode);
+                recorderNode.disconnect(audioContext.destination);
+                recorderNode = null;
+                recordBtn.textContent = 'Record';
+                recordBtn.classList.remove('recording');
+                exportWAV(recordedData);
+                recordedData = [];
+            } else {
+                if (!audioBuffer) {
+                    alert("Please upload an audio file first.");
+                    return;
+                }
+                recorderNode = audioContext.createScriptProcessor(4096, 2, 2);
+                recorderNode.onaudioprocess = (e) => {
+                    if (!isRecording) return;
+                    const inputBuffer = e.inputBuffer;
+                    for (let i = 0; i < inputBuffer.numberOfChannels; i++) {
+                        if (!recordedData[i]) recordedData[i] = [];
+                        recordedData[i].push(new Float32Array(inputBuffer.getChannelData(i)));
+                    }
+                };
+                effects.masterGain.connect(recorderNode);
+                recorderNode.connect(audioContext.destination);
+                isRecording = true;
+                recordBtn.textContent = 'Stop';
+                recordBtn.classList.add('recording');
+            }
+        }
+
+        function exportWAV(recordedData) {
+            const numberOfChannels = recordedData.length;
+            if (numberOfChannels === 0) return;
+            const sampleRate = audioContext.sampleRate;
+            const channelSamples = recordedData.map(channelBuffers => {
+                const totalLength = channelBuffers.reduce((len, buf) => len + buf.length, 0);
+                const combined = new Float32Array(totalLength);
+                let offset = 0;
+                for (const buffer of channelBuffers) {
+                    combined.set(buffer, offset);
+                    offset += buffer.length;
+                }
+                return combined;
+            });
+            const totalSampleCount = channelSamples[0].length;
+            const interleaved = new Float32Array(totalSampleCount * numberOfChannels);
+            let offset = 0;
+            for (let i = 0; i < totalSampleCount; i++) {
+                for (let j = 0; j < numberOfChannels; j++) {
+                    interleaved[offset++] = channelSamples[j][i];
+                }
+            }
+            const pcmData = new Int16Array(interleaved.length);
+            for (let i = 0; i < interleaved.length; i++) {
+                let s = Math.max(-1, Math.min(1, interleaved[i]));
+                pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+            }
+            const buffer = new ArrayBuffer(44 + pcmData.length * 2);
+            const view = new DataView(buffer);
+            const writeString = (view, offset, string) => {
+                for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+            };
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + pcmData.length * 2, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, numberOfChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * numberOfChannels * 2, true);
+            view.setUint16(32, numberOfChannels * 2, true);
+            view.setUint16(34, 16, true);
+            writeString(view, 36, 'data');
+            view.setUint32(40, pcmData.length * 2, true);
+            for (let i = 0; i < pcmData.length; i++) view.setInt16(44 + i * 2, pcmData[i], true);
+            const blob = new Blob([view], { type: 'audio/wav' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'granular_recording.wav';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        resetBtn.addEventListener('click', () => {
+            document.querySelectorAll('.knob-container').forEach(knob => {
+                const defaultValue = parseFloat(knob.dataset.defaultValue);
+                knob.setValue(defaultValue);
+            });
+            document.querySelectorAll('.square-slider-container').forEach(slider => {
+                const defaultChecked = slider.dataset.defaultChecked === 'true';
+                if (slider.updateState) {
+                    slider.updateState(defaultChecked);
+                }
+            });
+        });
+
+        function setupDraggableCanvas() {
+            const canvasContainer = document.getElementById('canvas-container');
+            const dragHandle = document.getElementById('drag-handle-rect');
+            let canvasX = 0, canvasY = 0;
+
+            const onDragStart = (startX, startY) => {
+                dragHandle.style.cursor = 'grabbing';
+                const initialCanvasX = canvasX;
+                const initialCanvasY = canvasY;
+                
+                const onDrag = (currentX, currentY) => {
+                    const dx = currentX - startX;
+                    const dy = currentY - startY;
+                    canvasX = initialCanvasX + dx;
+                    canvasY = initialCanvasY + dy;
+                    canvasContainer.style.transform = `translate(-50%, 0) translate3d(${canvasX}px, ${canvasY}px, 0)`;
+                };
+                return onDrag;
+            };
+
+            dragHandle.addEventListener('mousedown', e => {
+                const onDrag = onDragStart(e.clientX, e.clientY);
+                const onMouseMove = (moveEvent) => onDrag(moveEvent.clientX, moveEvent.clientY);
+                const onMouseUp = () => {
+                    dragHandle.style.cursor = 'grab';
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                };
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+
+            dragHandle.addEventListener('touchstart', e => {
+                const touch = e.changedTouches[0];
+                const touchId = touch.identifier;
+                const onDrag = onDragStart(touch.clientX, touch.clientY);
+
+                const onTouchMove = (moveEvent) => {
+                    for (const t of moveEvent.changedTouches) {
+                        if (t.identifier === touchId) {
+                            moveEvent.preventDefault();
+                            onDrag(t.clientX, t.clientY);
+                            break;
+                        }
+                    }
+                };
+
+                const onTouchEnd = (endEvent) => {
+                    for (const t of endEvent.changedTouches) {
+                        if (t.identifier === touchId) {
+                            dragHandle.style.cursor = 'grab';
+                            document.removeEventListener('touchmove', onTouchMove);
+                            document.removeEventListener('touchend', onTouchEnd);
+                            break;
+                        }
+                    }
+                };
+
+                document.addEventListener('touchmove', onTouchMove, { passive: false });
+                document.addEventListener('touchend', onTouchEnd);
+            }, { passive: false });
+
+            let lastTap = 0;
+            dragHandle.addEventListener('dblclick', resetCanvasPosition);
+            dragHandle.addEventListener('touchend', (e) => {
+                const currentTime = new Date().getTime();
+                if (currentTime - lastTap < 300) {
+                    e.preventDefault();
+                    resetCanvasPosition();
+                }
+                lastTap = currentTime;
+            });
+
+            function resetCanvasPosition() {
+                canvasX = 0;
+                canvasY = 0;
+                canvasContainer.style.transition = 'transform 0.3s ease';
+                canvasContainer.style.transform = `translate(-50%, 0) translate3d(0px, 0px, 0)`;
+                setTimeout(() => {
+                    canvasContainer.style.transition = '';
+                }, 300);
+            }
+        }
+
+        function setupKnobs() {
+            document.querySelectorAll('.knob-container').forEach(container => {
+                const min = parseFloat(container.dataset.min);
+                const max = parseFloat(container.dataset.max);
+                let value = parseFloat(container.dataset.value);
+                container.dataset.defaultValue = value;
+                const id = container.dataset.id;
+
+                const svgNS = "http://www.w3.org/2000/svg";
+                const svg = document.createElementNS(svgNS, "svg");
+                svg.setAttribute("viewBox", "0 0 100 100");
+                
+                const track = document.createElementNS(svgNS, "circle");
+                track.setAttribute("class", "knob-track");
+                track.setAttribute("cx", "50");
+                track.setAttribute("cy", "50");
+                track.setAttribute("r", "40");
+                
+                const fill = document.createElementNS(svgNS, "circle");
+                fill.setAttribute("class", "knob-fill");
+                fill.setAttribute("cx", "50");
+                fill.setAttribute("cy", "50");
+                fill.setAttribute("r", "40");
+                
+                const circumference = 2 * Math.PI * 40;
+                const totalAngle = 270;
+                const arcLength = (circumference * totalAngle) / 360;
+                track.setAttribute("stroke-dasharray", `${arcLength} ${circumference - arcLength}`);
+                fill.setAttribute("stroke-dashoffset", circumference);
+
+                svg.appendChild(track);
+                svg.appendChild(fill);
+                container.appendChild(svg);
+
+                const updateFill = (val) => {
+                    const percentage = (val - min) / (max - min);
+                    const fillLength = arcLength * percentage;
+                    fill.setAttribute("stroke-dasharray", `${fillLength} ${circumference - fillLength}`);
+                };
+
+                container.setValue = (newValue) => {
+                    value = Math.max(min, Math.min(max, newValue));
+                    container.dataset.value = value;
+                    updateFill(value);
+                    updateAudioParameter(id, value);
+                };
+
+                const onDragStart = (startX) => {
+                    const valueOnStart = value;
+                    const onDrag = (currentX) => {
+                        const deltaX = currentX - startX;
+                        const range = max - min;
+                        const newValue = valueOnStart + (deltaX * range / 200);
+                        container.setValue(newValue);
+                    };
+                    return onDrag;
+                };
+
+                container.addEventListener('mousedown', e => {
+                    const onDrag = onDragStart(e.clientX);
+                    const onMouseMove = (moveEvent) => onDrag(moveEvent.clientX);
+                    const onMouseUp = () => {
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                    };
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                });
+
+                container.addEventListener('touchstart', e => {
+                    const touch = e.changedTouches[0];
+                    const touchId = touch.identifier;
+                    const onDrag = onDragStart(touch.clientX);
+                    const onTouchMove = (moveEvent) => {
+                        for (const t of moveEvent.changedTouches) if (t.identifier === touchId) onDrag(t.clientX);
+                    };
+                    const onTouchEnd = (endEvent) => {
+                        for (const t of endEvent.changedTouches) {
+                            if (t.identifier === touchId) {
+                                document.removeEventListener('touchmove', onTouchMove);
+                                document.removeEventListener('touchend', onTouchEnd);
+                            }
+                        }
+                    };
+                    document.addEventListener('touchmove', onTouchMove, { passive: false });
+                    document.addEventListener('touchend', onTouchEnd);
+                }, { passive: false });
+
+                container.addEventListener('dblclick', () => {
+                    container.setValue(parseFloat(container.dataset.defaultValue));
+                });
+
+                container.setValue(value);
+            });
+        }
+
+        function setupSquareSliders() {
+            document.querySelectorAll('.square-slider-container').forEach(slider => {
+                const fill = slider.querySelector('.square-slider-fill');
+                let didDrag = false;
+
+                slider.updateState = (checked, applyTransition = true) => {
+                    slider.dataset.checked = checked;
+                    fill.style.transition = applyTransition ? 'transform 0.2s' : 'none';
+                    fill.style.transform = `scaleX(${checked ? 1 : 0})`;
+                    slider.dispatchEvent(new CustomEvent('statechange', { detail: { checked } }));
+                };
+
+                const onDragStart = (startX) => {
+                    const startChecked = slider.dataset.checked === 'true';
+                    const onDrag = (currentX) => {
+                        didDrag = true;
+                        const deltaX = currentX - startX;
+                        const width = slider.offsetWidth;
+                        let fillPercent = (startChecked ? width + deltaX : deltaX) / width;
+                        fillPercent = Math.max(0, Math.min(1, fillPercent));
+                        fill.style.transition = 'none';
+                        fill.style.transform = `scaleX(${fillPercent})`;
+                    };
+                    const onDragEnd = (currentX) => {
+                        const deltaX = currentX - startX;
+                        if (Math.abs(deltaX) > 2) {
+                            slider.updateState(deltaX > 0);
+                        }
+                    };
+                    return { onDrag, onDragEnd };
+                };
+
+                slider.addEventListener('mousedown', e => {
+                    didDrag = false;
+                    const { onDrag, onDragEnd } = onDragStart(e.clientX);
+                    const onMouseMove = (moveEvent) => onDrag(moveEvent.clientX);
+                    const onMouseUp = (upEvent) => {
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                        onDragEnd(upEvent.clientX);
+                    };
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                });
+
+                slider.addEventListener('touchstart', e => {
+                    didDrag = false;
+                    const touch = e.changedTouches[0];
+                    const touchId = touch.identifier;
+                    const { onDrag, onDragEnd } = onDragStart(touch.clientX);
+                    const onTouchMove = (moveEvent) => {
+                        for (const t of moveEvent.changedTouches) if (t.identifier === touchId) onDrag(t.clientX);
+                    };
+                    const onTouchEnd = (endEvent) => {
+                        for (const t of endEvent.changedTouches) {
+                            if (t.identifier === touchId) {
+                                document.removeEventListener('touchmove', onTouchMove);
+                                document.removeEventListener('touchend', onTouchEnd);
+                                onDragEnd(t.clientX);
+                            }
+                        }
+                    };
+                    document.addEventListener('touchmove', onTouchMove, { passive: false });
+                    document.addEventListener('touchend', onTouchEnd);
+                }, { passive: false });
+
+                slider.addEventListener('click', (e) => {
+                    if (!didDrag) {
+                        slider.updateState(slider.dataset.checked !== 'true');
+                    }
+                });
+
+                slider.addEventListener('statechange', (e) => {
+                    const checked = e.detail.checked;
+                    const id = slider.dataset.id;
+                    if (id === 'theme-toggle') {
+                        const theme = checked ? 'light' : 'dark';
+                        document.body.setAttribute('data-theme', theme);
+                        if (audioBuffer) drawWaveform(audioBuffer);
+                        return;
+                    }
+                    if (slider.classList.contains('group-toggle')) {
+                        const group = slider.closest('.effect-group');
+                        group.querySelector('.effect-controls').style.display = checked ? 'grid' : 'none';
+                        const effectName = group.dataset.effect;
+                        if (effects[effectName]) effects[effectName].bypass = !checked;
+                        return;
+                    }
+                    const paramName = id.replace(/-./g, x => x[1].toUpperCase());
+                    if (paramName === 'pitchSync') {
+                        if (granularNode) granularNode.parameters.get('pitchSync').setValueAtTime(checked ? 1 : 0, audioContext.currentTime);
+                        return;
+                    }
+                    const mapping = tunaMappings[paramName];
+                    if (mapping && effects[mapping.node]) effects[mapping.node][mapping.param] = checked;
+                });
+                slider.updateState(slider.dataset.checked === 'true', false);
+            });
+        }
+
+        function setupCustomScrollbar() {
+            const container = document.querySelector('.container');
+            const scrollbar = document.getElementById('custom-scrollbar');
+            const thumb = document.getElementById('scrollbar-thumb');
+
+            const updateThumb = () => {
+                const scrollableHeight = container.scrollHeight - container.clientHeight;
+                if (scrollableHeight <= 0) {
+                    scrollbar.style.display = 'none';
+                    return;
+                }
+                scrollbar.style.display = 'block';
+                const trackHeight = scrollbar.clientHeight;
+                const thumbHeight = Math.max(20, (container.clientHeight / container.scrollHeight) * trackHeight);
+                thumb.style.height = `${thumbHeight}px`;
+
+                const scrollPercentage = container.scrollTop / scrollableHeight;
+                const thumbTop = scrollPercentage * (trackHeight - thumbHeight);
+                thumb.style.top = `${thumbTop}px`;
+            };
+
+            container.addEventListener('scroll', updateThumb);
+            new ResizeObserver(updateThumb).observe(container);
+
+            const onDragStart = (startY) => {
+                const initialScrollTop = container.scrollTop;
+                const trackHeight = scrollbar.clientHeight;
+                const thumbHeight = thumb.offsetHeight;
+                
+                const onDrag = (currentY) => {
+                    const deltaY = currentY - startY;
+                    const scrollableHeight = container.scrollHeight - container.clientHeight;
+                    const scrollDelta = (deltaY / (trackHeight - thumbHeight)) * scrollableHeight;
+                    container.scrollTop = initialScrollTop + scrollDelta;
+                };
+                return onDrag;
+            };
+
+            thumb.addEventListener('mousedown', e => {
+                e.stopPropagation();
+                const onDrag = onDragStart(e.clientY);
+                const onMouseMove = (moveEvent) => onDrag(moveEvent.clientY);
+                const onMouseUp = () => {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                };
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+
+            thumb.addEventListener('touchstart', e => {
+                e.stopPropagation();
+                const touch = e.changedTouches[0];
+                const touchId = touch.identifier;
+                const onDrag = onDragStart(touch.clientY);
+                const onTouchMove = (moveEvent) => {
+                    for (const t of moveEvent.changedTouches) if (t.identifier === touchId) onDrag(t.clientY);
+                };
+                const onTouchEnd = (endEvent) => {
+                    for (const t of endEvent.changedTouches) {
+                        if (t.identifier === touchId) {
+                            document.removeEventListener('touchmove', onTouchMove);
+                            document.removeEventListener('touchend', onTouchEnd);
+                        }
+                    }
+                };
+                document.addEventListener('touchmove', onTouchMove, { passive: false });
+                document.addEventListener('touchend', onTouchEnd);
+            }, { passive: false });
+        }
+
+        window.onload = () => {
+             const dpr = window.devicePixelRatio || 1;
+             const rect = canvas.getBoundingClientRect();
+             canvas.width = rect.width * dpr;
+             canvas.height = rect.height * dpr;
+             ctx.scale(dpr, dpr);
+             setupAudioChain();
+             setupDraggableCanvas();
+             setupKnobs();
+             setupSquareSliders();
+             setupCustomScrollbar();
+        };
+    </script>
+</body>
+</html>
