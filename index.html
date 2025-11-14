@@ -311,11 +311,16 @@
             width: 95%;
             max-width: 600px;
             z-index: 50;
+            transition: transform 0.4s ease-in-out;
+        }
+
+        .bottom-controls.hidden {
+            transform: translate(-50%, 150%);
         }
 
         .button-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
             padding: 15px;
             background-color: var(--surface);
@@ -324,7 +329,8 @@
         }
 
         button,
-        .file-upload-wrapper label {
+        .file-upload-wrapper label,
+        a#github-btn {
             background-color: transparent;
             color: var(--text);
             border: 1px solid var(--outline);
@@ -336,6 +342,16 @@
             transition: background-color .2s, border-color .2s;
             text-align: center;
             width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        #github-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
         }
 
         .file-upload-wrapper {
@@ -343,7 +359,8 @@
         }
 
         button:hover,
-        .file-upload-wrapper label:hover {
+        .file-upload-wrapper label:hover,
+        a#github-btn:hover {
             background-color: var(--outline);
         }
 
@@ -356,21 +373,6 @@
 
         input[type=file] {
             display: none;
-        }
-
-        .impulse-control {
-            grid-column: 1 / -1;
-            display: flex;
-            gap: 10px;
-        }
-
-        .impulse-control input {
-            flex-grow: 1;
-            background-color: var(--bg);
-            border: 1px solid var(--outline);
-            color: var(--text);
-            border-radius: 4px;
-            padding: 5px;
         }
 
         .autoplay-controls {
@@ -490,16 +492,12 @@
                         <div class="knob-container" data-id="reverse-chance" data-min="0" data-max="1" data-value="0" data-step="0.01"></div>
                     </div>
                     <div class="control">
-                        <label>Density Jitter</label>
-                        <div class="knob-container" data-id="density-jitter" data-min="0" data-max="0.1" data-value="0" data-step="0.001"></div>
-                    </div>
-                    <div class="control">
                         <label>Noise</label>
-                        <div class="knob-container" data-id="noise-amount" data-min="0" data-max="0.2" data-value="0" data-step="0.001"></div>
+                        <div class="knob-container" data-id="noise-amount" data-min="0" data-max="1.0" data-value="0" data-step="0.001"></div>
                     </div>
                     <div class="control">
-                        <label>Gain</label>
-                        <div class="knob-container" data-id="granular-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
+                        <label>Noise Type</label>
+                        <div class="knob-container" data-id="noise-type" data-min="0" data-max="2" data-value="0" data-step="1"></div>
                     </div>
                     <div class="control">
                         <label>Pitch Sync</label>
@@ -542,10 +540,6 @@
                         <div class="knob-container" data-id="comp-makeupGain" data-min="0" data-max="20" data-value="1"></div>
                     </div>
                     <div class="control">
-                        <label>Gain</label>
-                        <div class="knob-container" data-id="compressor-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
-                    </div>
-                    <div class="control">
                         <label>Auto Makeup</label>
                         <div class="square-slider-container" data-id="comp-automakeup" data-checked="false" data-default-checked="false">
                             <div class="square-slider-fill"></div>
@@ -577,10 +571,6 @@
                         <label>Algorithm</label>
                         <div class="knob-container" data-id="overdrive-algorithmIndex" data-min="0" data-max="5" data-value="0" data-step="1"></div>
                     </div>
-                    <div class="control">
-                        <label>Gain</label>
-                        <div class="knob-container" data-id="overdrive-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
-                    </div>
                 </div>
             </div>
             <div class="effect-group" data-effect="chorus">
@@ -606,10 +596,6 @@
                     <div class="control">
                         <label>Delay</label>
                         <div class="knob-container" data-id="chorus-delay" data-min="0" data-max="0.1" data-value="0.0045" data-step="0.0001"></div>
-                    </div>
-                    <div class="control">
-                        <label>Gain</label>
-                        <div class="knob-container" data-id="chorus-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
                     </div>
                 </div>
             </div>
@@ -641,10 +627,6 @@
                         <label>Base Freq</label>
                         <div class="knob-container" data-id="phaser-baseModulationFrequency" data-min="500" data-max="1500" data-value="700" data-step="1"></div>
                     </div>
-                    <div class="control">
-                        <label>Gain</label>
-                        <div class="knob-container" data-id="phaser-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
-                    </div>
                 </div>
             </div>
             <div class="effect-group" data-effect="tremolo">
@@ -666,10 +648,6 @@
                     <div class="control">
                         <label>Phase</label>
                         <div class="knob-container" data-id="tremolo-stereoPhase" data-min="0" data-max="180" data-value="0" data-step="1"></div>
-                    </div>
-                    <div class="control">
-                        <label>Gain</label>
-                        <div class="knob-container" data-id="tremolo-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
                     </div>
                 </div>
             </div>
@@ -696,10 +674,6 @@
                     <div class="control">
                         <label>Mix</label>
                         <div class="knob-container" data-id="delay-mix" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div>
-                    </div>
-                    <div class="control">
-                        <label>Gain</label>
-                        <div class="knob-container" data-id="delay-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
                     </div>
                     <div class="control" style="grid-column:1 / -1;width:100%"><button id="stop-delay-btn">Stop Sound</button></div>
                 </div>
@@ -732,11 +706,6 @@
                         <label>Low Cut</label>
                         <div class="knob-container" data-id="reverb-lowCut" data-min="20" data-max="22050" data-value="20" step="1"></div>
                     </div>
-                    <div class="control">
-                        <label>Gain</label>
-                        <div class="knob-container" data-id="reverb-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
-                    </div>
-                    <div class="impulse-control"><input type="text" id="reverb-impulse" value="https://raw.githubusercontent.com/Theodeus/tuna/master/impulses/impulse_rev.wav"><button id="load-reverb-impulse">Load</button></div>
                 </div>
             </div>
         </div>
@@ -752,6 +721,11 @@
             </div>
             <button id="record-btn">Record</button>
             <button id="reset-btn">Reset All</button>
+            <a href="https://github.com/example" target="_blank" rel="noopener noreferrer" id="github-btn">
+                <svg viewBox="0 0 16 16" version="1.1" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+            </a>
         </div>
     </div>
     <script>
@@ -795,6 +769,12 @@
                     this._buffers = [];
                     this._lastGrainTime = 0;
                     this.grains = [];
+                    
+                    this._pinkB_L = [0, 0, 0, 0, 0, 0, 0];
+                    this._pinkB_R = [0, 0, 0, 0, 0, 0, 0];
+                    this._brownLastOut_L = 0;
+                    this._brownLastOut_R = 0;
+
                     this.port.onmessage = (event) => {
                         if (event.data.buffers) {
                             this._buffers = event.data.buffers;
@@ -814,8 +794,8 @@
                         { name: 'spread', defaultValue: 0.1, minValue: 0, maxValue: 1 },
                         { name: 'pitchSync', defaultValue: 0, minValue: 0, maxValue: 1 },
                         { name: 'reverseChance', defaultValue: 0, minValue: 0, maxValue: 1 },
-                        { name: 'densityJitter', defaultValue: 0, minValue: 0, maxValue: 0.1 },
-                        { name: 'noiseAmount', defaultValue: 0, minValue: 0, maxValue: 0.2 }
+                        { name: 'noiseAmount', defaultValue: 0, minValue: 0, maxValue: 1.0 },
+                        { name: 'noiseType', defaultValue: 0, minValue: 0, maxValue: 2 }
                     ];
                 }
 
@@ -833,8 +813,7 @@
                         return true;
                     }
                     
-                    const densityJitterAmount = (Math.random() - 0.5) * parameters.densityJitter[0];
-                    const grainInterval = (1.0 / parameters.grainDensity[0]) + densityJitterAmount;
+                    const grainInterval = 1.0 / parameters.grainDensity[0];
 
                     if (currentTime > this._lastGrainTime + Math.max(0.001, grainInterval)) {
                         this._lastGrainTime = currentTime;
@@ -852,9 +831,10 @@
                         
                         const pitchRand = (Math.random() * 2 - 1) * parameters.pitchJitter[0];
                         const finalPitch = parameters.pitch[0] + pitchRand;
+                        const isPitchSynced = parameters.pitchSync[0] > 0.5;
 
                         let totalDurationSamples;
-                        if (parameters.pitchSync[0] > 0.5) {
+                        if (isPitchSynced) {
                             totalDurationSamples = grainSizeSamples;
                         } else {
                             totalDurationSamples = Math.floor(grainSizeSamples / finalPitch);
@@ -868,13 +848,54 @@
                             pitch: finalPitch,
                             totalDurationSamples: totalDurationSamples,
                             pan: finalPan,
-                            direction: Math.random() < parameters.reverseChance[0] ? -1 : 1
+                            direction: Math.random() < parameters.reverseChance[0] ? -1 : 1,
+                            isPitchSynced: isPitchSynced
                         });
                     }
+
+                    const noiseAmount = parameters.noiseAmount[0];
+                    const noiseType = Math.round(parameters.noiseType[0]);
 
                     for (let i = 0; i < outputLength; i++) {
                         let leftSample = 0;
                         let rightSample = 0;
+
+                        let noiseL = 0;
+                        let noiseR = 0;
+
+                        const whiteL = Math.random() * 2 - 1;
+                        const whiteR = Math.random() * 2 - 1;
+
+                        if (noiseType === 0) { // White
+                            noiseL = whiteL;
+                            noiseR = whiteR;
+                        } else if (noiseType === 1) { // Pink
+                            this._pinkB_L[0] = 0.99886 * this._pinkB_L[0] + whiteL * 0.0555179;
+                            this._pinkB_L[1] = 0.99332 * this._pinkB_L[1] + whiteL * 0.0750759;
+                            this._pinkB_L[2] = 0.96900 * this._pinkB_L[2] + whiteL * 0.1538520;
+                            this._pinkB_L[3] = 0.86650 * this._pinkB_L[3] + whiteL * 0.3104856;
+                            this._pinkB_L[4] = 0.55000 * this._pinkB_L[4] + whiteL * 0.5329522;
+                            this._pinkB_L[5] = -0.7616 * this._pinkB_L[5] - whiteL * 0.0168980;
+                            noiseL = this._pinkB_L[0] + this._pinkB_L[1] + this._pinkB_L[2] + this._pinkB_L[3] + this._pinkB_L[4] + this._pinkB_L[5] + this._pinkB_L[6] + whiteL * 0.5362;
+                            this._pinkB_L[6] = whiteL * 0.115926;
+                            noiseL /= 5.0;
+
+                            this._pinkB_R[0] = 0.99886 * this._pinkB_R[0] + whiteR * 0.0555179;
+                            this._pinkB_R[1] = 0.99332 * this._pinkB_R[1] + whiteR * 0.0750759;
+                            this._pinkB_R[2] = 0.96900 * this._pinkB_R[2] + whiteR * 0.1538520;
+                            this._pinkB_R[3] = 0.86650 * this._pinkB_R[3] + whiteR * 0.3104856;
+                            this._pinkB_R[4] = 0.55000 * this._pinkB_R[4] + whiteR * 0.5329522;
+                            this._pinkB_R[5] = -0.7616 * this._pinkB_R[5] - whiteR * 0.0168980;
+                            noiseR = this._pinkB_R[0] + this._pinkB_R[1] + this._pinkB_R[2] + this._pinkB_R[3] + this._pinkB_R[4] + this._pinkB_R[5] + this._pinkB_R[6] + whiteR * 0.5362;
+                            this._pinkB_R[6] = whiteR * 0.115926;
+                            noiseR /= 5.0;
+                        } else { // Brown
+                            this._brownLastOut_L = (this._brownLastOut_L + (0.02 * whiteL)) / 1.02;
+                            this._brownLastOut_R = (this._brownLastOut_R + (0.02 * whiteR)) / 1.02;
+                            noiseL = this._brownLastOut_L * 3.5;
+                            noiseR = this._brownLastOut_R * 3.5;
+                        }
+
 
                         for (const grain of this.grains) {
                             const progress = grain.playbackPosition / grain.totalDurationSamples;
@@ -888,12 +909,21 @@
                                     readPosition = Math.floor((grain.totalDurationSamples - grain.playbackPosition) * grain.pitch);
                                 }
 
+                                if (grain.isPitchSynced && grain.buffers[0].length > 0) {
+                                    readPosition = readPosition % grain.buffers[0].length;
+                                }
+
                                 if (readPosition >= 0 && readPosition < grain.buffers[0].length) {
-                                    const noise = (Math.random() * 2 - 1) * parameters.noiseAmount[0];
                                     const isStereo = grain.buffers.length > 1 && grain.buffers[1].length > readPosition;
                                     
-                                    const grainSampleL = (grain.buffers[0][readPosition] + noise) * envelope;
-                                    const grainSampleR = isStereo ? (grain.buffers[1][readPosition] + noise) * envelope : grainSampleL;
+                                    const rawSampleL = grain.buffers[0][readPosition];
+                                    const rawSampleR = isStereo ? grain.buffers[1][readPosition] : rawSampleL;
+
+                                    const modulatedNoiseL = noiseL * noiseAmount * Math.abs(rawSampleL);
+                                    const modulatedNoiseR = noiseR * noiseAmount * Math.abs(rawSampleR);
+
+                                    const grainSampleL = (rawSampleL + modulatedNoiseL) * envelope;
+                                    const grainSampleR = (rawSampleR + modulatedNoiseR) * envelope;
 
                                     let pannedL = grainSampleL;
                                     let pannedR = grainSampleR;
@@ -940,7 +970,6 @@
                 filterNode = audioContext.createBiquadFilter();
                 pannerNode = audioContext.createStereoPanner();
                 const effectConstructors = {
-                    granular: () => audioContext.createGain(),
                     compressor: () => new tuna.Compressor({
                         bypass: true
                     }),
@@ -960,7 +989,7 @@
                         bypass: true
                     }),
                     reverb: () => new tuna.Convolver({
-                        impulse: document.getElementById('reverb-impulse').value,
+                        impulse: "https://raw.githubusercontent.com/Theodeus/tuna/master/impulses/impulse_rev.wav",
                         bypass: true
                     })
                 };
@@ -971,9 +1000,6 @@
                         const effect = effectConstructors[effectName]();
                         effects[effectName] = effect;
                         chain.push(effect);
-                        const gainNode = audioContext.createGain();
-                        effects[effectName + 'Gain'] = gainNode;
-                        chain.push(gainNode);
                     }
                 });
                 effects.masterGain = audioContext.createGain();
@@ -1248,11 +1274,6 @@
                 granularNode.parameters.get(paramName).setTargetAtTime(value, audioContext.currentTime, 0.01);
             } else if (paramName === 'pan' && pannerNode) {
                 pannerNode.pan.setTargetAtTime(value, audioContext.currentTime, 0.01);
-            } else if (paramName.endsWith('Gain')) {
-                const effectName = paramName.replace('Gain', '');
-                if (effects[effectName + 'Gain']) {
-                    effects[effectName + 'Gain'].gain.setTargetAtTime(value, audioContext.currentTime, 0.01);
-                }
             } else {
                 const mapping = tunaMappings[paramName];
                 if (mapping && effects[mapping.node]) {
@@ -1260,10 +1281,6 @@
                 }
             }
         }
-        document.getElementById('load-reverb-impulse').addEventListener('click', () => {
-            const url = document.getElementById('reverb-impulse').value;
-            if (effects.reverb) effects.reverb.loadImpulse(url);
-        });
         document.getElementById('stop-delay-btn').addEventListener('click', () => {
             const feedbackKnob = document.querySelector('.knob-container[data-id="delay-feedback"]');
             const mixKnob = document.querySelector('.knob-container[data-id="delay-mix"]');
@@ -1851,6 +1868,21 @@
                 startAutoplay();
             }
         });
+
+        function setupScrollHidingControls() {
+            const container = document.querySelector('.container');
+            const controls = document.querySelector('.bottom-controls');
+            let scrollTimer = null;
+            container.addEventListener('scroll', () => {
+                if (!controls.classList.contains('hidden')) {
+                    controls.classList.add('hidden');
+                }
+                clearTimeout(scrollTimer);
+                scrollTimer = setTimeout(() => {
+                    controls.classList.remove('hidden');
+                }, 300);
+            });
+        }
         window.onload = () => {
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.getBoundingClientRect();
@@ -1862,6 +1894,7 @@
             setupKnobs();
             setupSquareSliders();
             setupCustomScrollbar();
+            setupScrollHidingControls();
             updateCropOverlays();
         };
     </script>
