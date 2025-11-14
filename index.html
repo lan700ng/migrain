@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -14,7 +15,6 @@
             --light-outline: #dadce0;
             --light-accent: #1a73e8;
             --light-record: #d93025;
-
             --dark-bg: #202124;
             --dark-surface: #303134;
             --dark-text: #e8eaed;
@@ -22,7 +22,6 @@
             --dark-outline: #5f6368;
             --dark-accent: #8ab4f8;
             --dark-record: #f28b82;
-
             --bg: var(--dark-bg);
             --surface: var(--dark-surface);
             --text: var(--dark-text);
@@ -59,7 +58,7 @@
             margin: 0;
             height: 100vh;
             touch-action: none;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color .3s, color .3s;
             overflow: hidden;
         }
 
@@ -80,9 +79,10 @@
             gap: 15px;
             max-height: calc(100vh - 374px);
             overflow-y: auto;
-            transition: background-color 0.3s, border-color 0.3s;
+            transition: background-color .3s, border-color .3s;
             scrollbar-width: none;
         }
+
         .container::-webkit-scrollbar {
             display: none;
         }
@@ -103,6 +103,7 @@
             position: relative;
             cursor: grab;
         }
+
         #scrollbar-thumb:active {
             cursor: grabbing;
         }
@@ -118,7 +119,7 @@
             font-size: 1.25rem;
             font-weight: 500;
         }
-        
+
         .effect-group h2 {
             font-size: 1rem;
             font-weight: 500;
@@ -143,7 +144,7 @@
             border: 1px solid var(--outline);
             border-radius: 8px;
             background-color: var(--surface);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, .2);
             z-index: 100;
         }
 
@@ -161,6 +162,24 @@
             display: block;
         }
 
+        .crop-overlay {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+
+        #crop-overlay-start {
+            left: 0;
+            width: 0;
+        }
+
+        #crop-overlay-end {
+            right: 0;
+            width: 0;
+        }
+
         #drag-handle-rect {
             width: 40px;
             height: 10px;
@@ -174,23 +193,37 @@
             z-index: 10;
             border: none;
         }
-        #drag-handle-rect:active { cursor: grabbing; }
 
-        #play-indicator-v, #play-indicator-h {
+        #drag-handle-rect:active {
+            cursor: grabbing;
+        }
+
+        #play-indicator-v,
+        #play-indicator-h {
             position: absolute;
             background-color: var(--record);
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.1s;
+            transition: opacity .1s;
         }
-        #play-indicator-v { width: 2px; height: 120px; top: 0; }
-        #play-indicator-h { height: 2px; width: 100%; left: 0; }
+
+        #play-indicator-v {
+            width: 2px;
+            height: 120px;
+            top: 0;
+        }
+
+        #play-indicator-h {
+            height: 2px;
+            width: 100%;
+            left: 0;
+        }
 
         #instructions {
             text-align: center;
             color: var(--text-secondary);
             min-height: 1.2em;
-            font-size: 0.9rem;
+            font-size: .9rem;
             margin: 0;
             padding: 5px;
             border-top: 1px solid var(--outline);
@@ -215,7 +248,7 @@
         }
 
         .control label {
-            font-size: 0.8rem;
+            font-size: .8rem;
             color: var(--text-secondary);
             text-align: center;
         }
@@ -233,14 +266,20 @@
             transform: rotate(135deg);
         }
 
-        .knob-track, .knob-fill {
+        .knob-track,
+        .knob-fill {
             fill: none;
             stroke-width: 12;
             stroke-linecap: round;
         }
 
-        .knob-track { stroke: var(--outline); }
-        .knob-fill { stroke: var(--accent); }
+        .knob-track {
+            stroke: var(--outline);
+        }
+
+        .knob-fill {
+            stroke: var(--accent);
+        }
 
         .square-slider-container {
             width: 40px;
@@ -260,7 +299,7 @@
             transform: scaleX(0);
         }
 
-        .square-slider-container[data-checked="true"] .square-slider-fill {
+        .square-slider-container[data-checked=true] .square-slider-fill {
             transform: scaleX(1);
         }
 
@@ -284,30 +323,47 @@
             border-radius: 12px;
         }
 
-        button, .file-upload-wrapper label {
+        button,
+        .file-upload-wrapper label {
             background-color: transparent;
             color: var(--text);
             border: 1px solid var(--outline);
             padding: 10px 15px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: .9rem;
             font-weight: 500;
-            transition: background-color 0.2s, border-color 0.2s;
+            transition: background-color .2s, border-color .2s;
             text-align: center;
             width: 100%;
         }
-        
-        .file-upload-wrapper { display: flex; }
-        button:hover, .file-upload-wrapper label:hover { background-color: var(--outline); }
-        #record-btn.recording { background-color: var(--record); color: var(--bg); border-color: var(--record); }
-        input[type="file"] { display: none; }
+
+        .file-upload-wrapper {
+            display: flex;
+        }
+
+        button:hover,
+        .file-upload-wrapper label:hover {
+            background-color: var(--outline);
+        }
+
+        #record-btn.recording,
+        #autoplay-btn.playing {
+            background-color: var(--record);
+            color: var(--bg);
+            border-color: var(--record);
+        }
+
+        input[type=file] {
+            display: none;
+        }
 
         .impulse-control {
             grid-column: 1 / -1;
             display: flex;
             gap: 10px;
         }
+
         .impulse-control input {
             flex-grow: 1;
             background-color: var(--bg);
@@ -316,19 +372,26 @@
             border-radius: 4px;
             padding: 5px;
         }
+
+        .autoplay-controls {
+            grid-column: 1 / -1;
+            display: contents;
+        }
     </style>
 </head>
+
 <body data-theme="dark">
     <div id="canvas-container">
         <div id="canvas-wrapper">
             <canvas id="waveform-canvas"></canvas>
+            <div id="crop-overlay-start" class="crop-overlay"></div>
+            <div id="crop-overlay-end" class="crop-overlay"></div>
             <div id="play-indicator-v"></div>
             <div id="play-indicator-h"></div>
         </div>
         <p id="instructions">Upload an audio file to begin.</p>
         <div id="drag-handle-rect"></div>
     </div>
-
     <div class="container-wrapper">
         <div class="container">
             <div class="header">
@@ -337,7 +400,55 @@
                     <div class="square-slider-fill"></div>
                 </div>
             </div>
-
+            <div class="effect-group" data-effect="input">
+                <div class="effect-header">
+                    <h2>Input</h2>
+                    <div class="square-slider-container group-toggle" data-checked="true" data-default-checked="true">
+                        <div class="square-slider-fill"></div>
+                    </div>
+                </div>
+                <div class="effect-controls">
+                    <div class="control">
+                        <label>Input Gain</label>
+                        <div class="knob-container" data-id="input-gain" data-min="0.1" data-max="10" data-value="1" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Preview Filter Type</label>
+                        <div class="knob-container" data-id="preview-filter-type" data-min="0" data-max="7" data-value="0" data-step="1"></div>
+                    </div>
+                    <div class="control">
+                        <label>Preview Filter Q</label>
+                        <div class="knob-container" data-id="preview-filter-q" data-min="0.0001" data-max="30" data-value="1" data-step="0.01"></div>
+                    </div>
+                    <div class="autoplay-controls">
+                        <div class="control" style="grid-column: 1 / -1; width: 100%;">
+                            <button id="autoplay-btn">Autoplay</button>
+                        </div>
+                        <div class="control">
+                            <label>Crop Start</label>
+                            <div class="knob-container" data-id="autoplay-crop-start" data-min="0" data-max="1" data-value="0" data-step="0.001"></div>
+                        </div>
+                        <div class="control">
+                            <label>Crop End</label>
+                            <div class="knob-container" data-id="autoplay-crop-end" data-min="0" data-max="1" data-value="1" data-step="0.001"></div>
+                        </div>
+                        <div class="control">
+                            <label>Speed</label>
+                            <div class="knob-container" data-id="autoplay-speed" data-min="0.1" data-max="4" data-value="1" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Vertical Pos</label>
+                            <div class="knob-container" data-id="autoplay-vertical-pos" data-min="0" data-max="1" data-value="0.5" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Direction</label>
+                            <div class="square-slider-container" data-id="autoplay-direction" data-checked="false" data-default-checked="false">
+                                <div class="square-slider-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="effect-group" data-effect="granular">
                 <div class="effect-header">
                     <h2>Granular</h2>
@@ -346,127 +457,286 @@
                     </div>
                 </div>
                 <div class="effect-controls">
-                    <div class="control"><label>Size</label><div class="knob-container" data-id="grain-size" data-min="10" data-max="500" data-value="100"></div></div>
-                    <div class="control"><label>Density</label><div class="knob-container" data-id="grain-density" data-min="1" data-max="100" data-value="20"></div></div>
-                    <div class="control"><label>Pitch</label><div class="knob-container" data-id="pitch" data-min="0.1" data-max="4.0" data-value="1.0" data-step="0.01"></div></div>
-                    <div class="control"><label>Pitch Jitter</label><div class="knob-container" data-id="pitch-jitter" data-min="0" data-max="1" data-value="0" data-step="0.01"></div></div>
-                    <div class="control"><label>Grain Jitter</label><div class="knob-container" data-id="grain-jitter" data-min="0" data-max="1000" data-value="0" data-step="1"></div></div>
-                    <div class="control"><label>Pan Jitter</label><div class="knob-container" data-id="spread" data-min="0" data-max="1" data-value="0.1" data-step="0.01"></div></div>
-                    <div class="control"><label>Pan</label><div class="knob-container" data-id="pan" data-min="-1" data-max="1" data-value="0" data-step="0.01"></div></div>
-                    <div class="control"><label>Reverse</label><div class="knob-container" data-id="reverse-chance" data-min="0" data-max="1" data-value="0" data-step="0.01"></div></div>
-                    <div class="control"><label>Density Jitter</label><div class="knob-container" data-id="density-jitter" data-min="0" data-max="0.1" data-value="0" data-step="0.001"></div></div>
-                    <div class="control"><label>Noise</label><div class="knob-container" data-id="noise-amount" data-min="0" data-max="0.2" data-value="0" data-step="0.001"></div></div>
-                    <div class="control"><label>Gain</label><div class="knob-container" data-id="granular-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
-                    <div class="control"><label>Pitch Sync</label><div class="square-slider-container" data-id="pitch-sync" data-checked="false" data-default-checked="false"> <div class="square-slider-fill"></div></div></div>
+                    <div class="control">
+                        <label>Size</label>
+                        <div class="knob-container" data-id="grain-size" data-min="10" data-max="500" data-value="100"></div>
+                    </div>
+                    <div class="control">
+                        <label>Density</label>
+                        <div class="knob-container" data-id="grain-density" data-min="1" data-max="100" data-value="20"></div>
+                    </div>
+                    <div class="control">
+                        <label>Pitch</label>
+                        <div class="knob-container" data-id="pitch" data-min="0.1" data-max="4.0" data-value="1.0" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Pitch Jitter</label>
+                        <div class="knob-container" data-id="pitch-jitter" data-min="0" data-max="1" data-value="0" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Grain Jitter</label>
+                        <div class="knob-container" data-id="grain-jitter" data-min="0" data-max="1000" data-value="0" data-step="1"></div>
+                    </div>
+                    <div class="control">
+                        <label>Pan Jitter</label>
+                        <div class="knob-container" data-id="spread" data-min="0" data-max="1" data-value="0.1" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Pan</label>
+                        <div class="knob-container" data-id="pan" data-min="-1" data-max="1" data-value="0" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Reverse</label>
+                        <div class="knob-container" data-id="reverse-chance" data-min="0" data-max="1" data-value="0" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Density Jitter</label>
+                        <div class="knob-container" data-id="density-jitter" data-min="0" data-max="0.1" data-value="0" data-step="0.001"></div>
+                    </div>
+                    <div class="control">
+                        <label>Noise</label>
+                        <div class="knob-container" data-id="noise-amount" data-min="0" data-max="0.2" data-value="0" data-step="0.001"></div>
+                    </div>
+                    <div class="control">
+                        <label>Gain</label>
+                        <div class="knob-container" data-id="granular-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Pitch Sync</label>
+                        <div class="square-slider-container" data-id="pitch-sync" data-checked="false" data-default-checked="false">
+                            <div class="square-slider-fill"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
             <div class="effect-group" data-effect="compressor">
                 <div class="effect-header">
                     <h2>Compressor</h2>
-                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div>
+                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
+                        <div class="square-slider-fill"></div>
+                    </div>
                 </div>
-                <div class="effect-controls" style="display: none;">
-                    <div class="control"><label>Threshold</label><div class="knob-container" data-id="comp-threshold" data-min="-100" data-max="0" data-value="-24"></div></div>
-                    <div class="control"><label>Ratio</label><div class="knob-container" data-id="comp-ratio" data-min="1" data-max="20" data-value="4"></div></div>
-                    <div class="control"><label>Knee</label><div class="knob-container" data-id="comp-knee" data-min="0" data-max="40" data-value="30"></div></div>
-                    <div class="control"><label>Attack</label><div class="knob-container" data-id="comp-attack" data-min="0" data-max="1" data-value="0.003" data-step="0.001"></div></div>
-                    <div class="control"><label>Release</label><div class="knob-container" data-id="comp-release" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div></div>
-                    <div class="control"><label>Makeup</label><div class="knob-container" data-id="comp-makeupGain" data-min="0" data-max="20" data-value="1"></div></div>
-                    <div class="control"><label>Gain</label><div class="knob-container" data-id="compressor-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
-                    <div class="control"><label>Auto Makeup</label><div class="square-slider-container" data-id="comp-automakeup" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div></div>
+                <div class="effect-controls" style="display:none">
+                    <div class="control">
+                        <label>Threshold</label>
+                        <div class="knob-container" data-id="comp-threshold" data-min="-100" data-max="0" data-value="-24"></div>
+                    </div>
+                    <div class="control">
+                        <label>Ratio</label>
+                        <div class="knob-container" data-id="comp-ratio" data-min="1" data-max="20" data-value="4"></div>
+                    </div>
+                    <div class="control">
+                        <label>Knee</label>
+                        <div class="knob-container" data-id="comp-knee" data-min="0" data-max="40" data-value="30"></div>
+                    </div>
+                    <div class="control">
+                        <label>Attack</label>
+                        <div class="knob-container" data-id="comp-attack" data-min="0" data-max="1" data-value="0.003" data-step="0.001"></div>
+                    </div>
+                    <div class="control">
+                        <label>Release</label>
+                        <div class="knob-container" data-id="comp-release" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Makeup</label>
+                        <div class="knob-container" data-id="comp-makeupGain" data-min="0" data-max="20" data-value="1"></div>
+                    </div>
+                    <div class="control">
+                        <label>Gain</label>
+                        <div class="knob-container" data-id="compressor-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Auto Makeup</label>
+                        <div class="square-slider-container" data-id="comp-automakeup" data-checked="false" data-default-checked="false">
+                            <div class="square-slider-fill"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
             <div class="effect-group" data-effect="overdrive">
                 <div class="effect-header">
                     <h2>Overdrive</h2>
-                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div>
+                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
+                        <div class="square-slider-fill"></div>
+                    </div>
                 </div>
-                <div class="effect-controls" style="display: none;">
-                    <div class="control"><label>Drive</label><div class="knob-container" data-id="overdrive-drive" data-min="0" data-max="1" data-value="0.5" data-step="0.01"></div></div>
-                    <div class="control"><label>Output</label><div class="knob-container" data-id="overdrive-outputGain" data-min="0" data-max="1" data-value="0.5" data-step="0.01"></div></div>
-                    <div class="control"><label>Curve</label><div class="knob-container" data-id="overdrive-curveAmount" data-min="0" data-max="1" data-value="1" data-step="0.01"></div></div>
-                    <div class="control"><label>Algorithm</label><div class="knob-container" data-id="overdrive-algorithmIndex" data-min="0" data-max="5" data-value="0" data-step="1"></div></div>
-                    <div class="control"><label>Gain</label><div class="knob-container" data-id="overdrive-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
+                <div class="effect-controls" style="display:none">
+                    <div class="control">
+                        <label>Drive</label>
+                        <div class="knob-container" data-id="overdrive-drive" data-min="0" data-max="1" data-value="0.5" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Output</label>
+                        <div class="knob-container" data-id="overdrive-outputGain" data-min="0" data-max="1" data-value="0.5" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Curve</label>
+                        <div class="knob-container" data-id="overdrive-curveAmount" data-min="0" data-max="1" data-value="1" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Algorithm</label>
+                        <div class="knob-container" data-id="overdrive-algorithmIndex" data-min="0" data-max="5" data-value="0" data-step="1"></div>
+                    </div>
+                    <div class="control">
+                        <label>Gain</label>
+                        <div class="knob-container" data-id="overdrive-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
+                    </div>
                 </div>
             </div>
-
             <div class="effect-group" data-effect="chorus">
                 <div class="effect-header">
                     <h2>Chorus</h2>
-                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div>
+                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
+                        <div class="square-slider-fill"></div>
+                    </div>
                 </div>
-                <div class="effect-controls" style="display: none;">
-                    <div class="control"><label>Rate</label><div class="knob-container" data-id="chorus-rate" data-min="0.01" data-max="8" data-value="1.5" data-step="0.01"></div></div>
-                    <div class="control"><label>Depth</label><div class="knob-container" data-id="chorus-depth" data-min="0" data-max="1" data-value="0.7" data-step="0.01"></div></div>
-                    <div class="control"><label>Feedback</label><div class="knob-container" data-id="chorus-feedback" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div></div>
-                    <div class="control"><label>Delay</label><div class="knob-container" data-id="chorus-delay" data-min="0" data-max="0.1" data-value="0.0045" data-step="0.0001"></div></div>
-                    <div class="control"><label>Gain</label><div class="knob-container" data-id="chorus-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
+                <div class="effect-controls" style="display:none">
+                    <div class="control">
+                        <label>Rate</label>
+                        <div class="knob-container" data-id="chorus-rate" data-min="0.01" data-max="8" data-value="1.5" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Depth</label>
+                        <div class="knob-container" data-id="chorus-depth" data-min="0" data-max="1" data-value="0.7" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Feedback</label>
+                        <div class="knob-container" data-id="chorus-feedback" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Delay</label>
+                        <div class="knob-container" data-id="chorus-delay" data-min="0" data-max="0.1" data-value="0.0045" data-step="0.0001"></div>
+                    </div>
+                    <div class="control">
+                        <label>Gain</label>
+                        <div class="knob-container" data-id="chorus-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
+                    </div>
                 </div>
             </div>
-
             <div class="effect-group" data-effect="phaser">
                 <div class="effect-header">
                     <h2>Phaser</h2>
-                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div>
+                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
+                        <div class="square-slider-fill"></div>
+                    </div>
                 </div>
-                <div class="effect-controls" style="display: none;">
-                    <div class="control"><label>Rate</label><div class="knob-container" data-id="phaser-rate" data-min="0.01" data-max="8" data-value="1.2" data-step="0.01"></div></div>
-                    <div class="control"><label>Depth</label><div class="knob-container" data-id="phaser-depth" data-min="0" data-max="1" data-value="0.3" data-step="0.01"></div></div>
-                    <div class="control"><label>Feedback</label><div class="knob-container" data-id="phaser-feedback" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div></div>
-                    <div class="control"><label>Phase</label><div class="knob-container" data-id="phaser-stereoPhase" data-min="0" data-max="180" data-value="30" data-step="1"></div></div>
-                    <div class="control"><label>Base Freq</label><div class="knob-container" data-id="phaser-baseModulationFrequency" data-min="500" data-max="1500" data-value="700" data-step="1"></div></div>
-                    <div class="control"><label>Gain</label><div class="knob-container" data-id="phaser-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
+                <div class="effect-controls" style="display:none">
+                    <div class="control">
+                        <label>Rate</label>
+                        <div class="knob-container" data-id="phaser-rate" data-min="0.01" data-max="8" data-value="1.2" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Depth</label>
+                        <div class="knob-container" data-id="phaser-depth" data-min="0" data-max="1" data-value="0.3" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Feedback</label>
+                        <div class="knob-container" data-id="phaser-feedback" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Phase</label>
+                        <div class="knob-container" data-id="phaser-stereoPhase" data-min="0" data-max="180" data-value="30" data-step="1"></div>
+                    </div>
+                    <div class="control">
+                        <label>Base Freq</label>
+                        <div class="knob-container" data-id="phaser-baseModulationFrequency" data-min="500" data-max="1500" data-value="700" data-step="1"></div>
+                    </div>
+                    <div class="control">
+                        <label>Gain</label>
+                        <div class="knob-container" data-id="phaser-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
+                    </div>
                 </div>
             </div>
-
             <div class="effect-group" data-effect="tremolo">
                 <div class="effect-header">
                     <h2>Tremolo</h2>
-                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div>
+                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
+                        <div class="square-slider-fill"></div>
+                    </div>
                 </div>
-                <div class="effect-controls" style="display: none;">
-                    <div class="control"><label>Intensity</label><div class="knob-container" data-id="tremolo-intensity" data-min="0" data-max="1" data-value="0.3" data-step="0.01"></div></div>
-                    <div class="control"><label>Rate</label><div class="knob-container" data-id="tremolo-rate" data-min="0.01" data-max="8" data-value="5" data-step="0.01"></div></div>
-                    <div class="control"><label>Phase</label><div class="knob-container" data-id="tremolo-stereoPhase" data-min="0" data-max="180" data-value="0" data-step="1"></div></div>
-                    <div class="control"><label>Gain</label><div class="knob-container" data-id="tremolo-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
+                <div class="effect-controls" style="display:none">
+                    <div class="control">
+                        <label>Intensity</label>
+                        <div class="knob-container" data-id="tremolo-intensity" data-min="0" data-max="1" data-value="0.3" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Rate</label>
+                        <div class="knob-container" data-id="tremolo-rate" data-min="0.01" data-max="8" data-value="5" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Phase</label>
+                        <div class="knob-container" data-id="tremolo-stereoPhase" data-min="0" data-max="180" data-value="0" data-step="1"></div>
+                    </div>
+                    <div class="control">
+                        <label>Gain</label>
+                        <div class="knob-container" data-id="tremolo-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
+                    </div>
                 </div>
             </div>
-
             <div class="effect-group" data-effect="delay">
                 <div class="effect-header">
                     <h2>Delay</h2>
-                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div>
-                </div>
-                <div class="effect-controls" style="display: none;">
-                    <div class="control"><label>Time</label><div class="knob-container" data-id="delay-time" data-min="1" data-max="2000" data-value="350" step="1"></div></div>
-                    <div class="control"><label>Feedback</label><div class="knob-container" data-id="delay-feedback" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div></div>
-                    <div class="control"><label>Cutoff</label><div class="knob-container" data-id="delay-cutoff" data-min="20" data-max="20000" data-value="2000" step="1"></div></div>
-                    <div class="control"><label>Mix</label><div class="knob-container" data-id="delay-mix" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div></div>
-                    <div class="control"><label>Gain</label><div class="knob-container" data-id="delay-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
-                    <div class="control" style="grid-column: 1 / -1; width: 100%;">
-                        <button id="stop-delay-btn">Stop Sound</button>
+                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
+                        <div class="square-slider-fill"></div>
                     </div>
                 </div>
+                <div class="effect-controls" style="display:none">
+                    <div class="control">
+                        <label>Time</label>
+                        <div class="knob-container" data-id="delay-time" data-min="1" data-max="2000" data-value="350" step="1"></div>
+                    </div>
+                    <div class="control">
+                        <label>Feedback</label>
+                        <div class="knob-container" data-id="delay-feedback" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Cutoff</label>
+                        <div class="knob-container" data-id="delay-cutoff" data-min="20" data-max="20000" data-value="2000" step="1"></div>
+                    </div>
+                    <div class="control">
+                        <label>Mix</label>
+                        <div class="knob-container" data-id="delay-mix" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Gain</label>
+                        <div class="knob-container" data-id="delay-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
+                    </div>
+                    <div class="control" style="grid-column:1 / -1;width:100%"><button id="stop-delay-btn">Stop Sound</button></div>
+                </div>
             </div>
-
             <div class="effect-group" data-effect="reverb">
                 <div class="effect-header">
                     <h2>Reverb</h2>
-                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false"><div class="square-slider-fill"></div></div>
-                </div>
-                <div class="effect-controls" style="display: none;">
-                    <div class="control"><label>Dry</label><div class="knob-container" data-id="reverb-dryLevel" data-min="0" data-max="1" data-value="1" data-step="0.01"></div></div>
-                    <div class="control"><label>Wet</label><div class="knob-container" data-id="reverb-wetLevel" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div></div>
-                    <div class="control"><label>Level</label><div class="knob-container" data-id="reverb-level" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
-                    <div class="control"><label>Damping</label><div class="knob-container" data-id="reverb-highCut" data-min="20" data-max="22050" data-value="22050" step="1"></div></div>
-                    <div class="control"><label>Low Cut</label><div class="knob-container" data-id="reverb-lowCut" data-min="20" data-max="22050" data-value="20" step="1"></div></div>
-                    <div class="control"><label>Gain</label><div class="knob-container" data-id="reverb-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div></div>
-                    <div class="impulse-control">
-                        <input type="text" id="reverb-impulse" value="https://raw.githubusercontent.com/Theodeus/tuna/master/impulses/impulse_rev.wav">
-                        <button id="load-reverb-impulse">Load</button>
+                    <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
+                        <div class="square-slider-fill"></div>
                     </div>
+                </div>
+                <div class="effect-controls" style="display:none">
+                    <div class="control">
+                        <label>Dry</label>
+                        <div class="knob-container" data-id="reverb-dryLevel" data-min="0" data-max="1" data-value="1" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Wet</label>
+                        <div class="knob-container" data-id="reverb-wetLevel" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Level</label>
+                        <div class="knob-container" data-id="reverb-level" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
+                    </div>
+                    <div class="control">
+                        <label>Damping</label>
+                        <div class="knob-container" data-id="reverb-highCut" data-min="20" data-max="22050" data-value="22050" step="1"></div>
+                    </div>
+                    <div class="control">
+                        <label>Low Cut</label>
+                        <div class="knob-container" data-id="reverb-lowCut" data-min="20" data-max="22050" data-value="20" step="1"></div>
+                    </div>
+                    <div class="control">
+                        <label>Gain</label>
+                        <div class="knob-container" data-id="reverb-gain" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
+                    </div>
+                    <div class="impulse-control"><input type="text" id="reverb-impulse" value="https://raw.githubusercontent.com/Theodeus/tuna/master/impulses/impulse_rev.wav"><button id="load-reverb-impulse">Load</button></div>
                 </div>
             </div>
         </div>
@@ -474,20 +744,18 @@
             <div id="scrollbar-thumb"></div>
         </div>
     </div>
-
     <div class="bottom-controls">
         <div class="button-grid">
             <div class="file-upload-wrapper">
-               <label for="audio-upload">Upload</label>
-               <input type="file" id="audio-upload" accept="audio/*">
-           </div>
-           <button id="record-btn">Record</button>
-           <button id="reset-btn">Reset All</button>
-       </div>
+                <label for="audio-upload">Upload</label>
+                <input type="file" id="audio-upload" accept="audio/*">
+            </div>
+            <button id="record-btn">Record</button>
+            <button id="reset-btn">Reset All</button>
+        </div>
     </div>
-
     <script>
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const audioContext = new(window.AudioContext || window.webkitAudioContext)();
         const tuna = new Tuna(audioContext);
         let audioBuffer = null;
         let granularNode = null;
@@ -495,7 +763,6 @@
         let pannerNode = null;
         let isPlaying = false;
         let activeCanvasTouchId = null;
-
         const fileUpload = document.getElementById('audio-upload');
         const canvas = document.getElementById('waveform-canvas');
         const ctx = canvas.getContext('2d');
@@ -503,14 +770,24 @@
         const playIndicatorH = document.getElementById('play-indicator-h');
         const instructions = document.getElementById('instructions');
         const resetBtn = document.getElementById('reset-btn');
-        
         const recordBtn = document.getElementById('record-btn');
         let isRecording = false;
         let recorderNode = null;
         let recordedData = [];
-
         let effects = {};
-
+        let autoplayState = {
+            isPlaying: false,
+            direction: false, // false for LTR, true for RTL
+            cropStart: 0,
+            cropEnd: 1,
+            speed: 1,
+            verticalPos: 0.5,
+            startTime: 0,
+            frameId: null
+        };
+        const autoplayBtn = document.getElementById('autoplay-btn');
+        const cropOverlayStart = document.getElementById('crop-overlay-start');
+        const cropOverlayEnd = document.getElementById('crop-overlay-end');
         const granularProcessorCode = `
             class GranularProcessor extends AudioWorkletProcessor {
                 constructor() {
@@ -613,17 +890,28 @@
 
                                 if (readPosition >= 0 && readPosition < grain.buffers[0].length) {
                                     const noise = (Math.random() * 2 - 1) * parameters.noiseAmount[0];
-                                    const grainSample = (grain.buffers[0][readPosition] + noise) * envelope;
+                                    const isStereo = grain.buffers.length > 1 && grain.buffers[1].length > readPosition;
                                     
-                                    const panR = (grain.pan + 1) / 2;
-                                    const panL = 1 - panR;
-                                    leftSample += grainSample * panL;
-                                    rightSample += grainSample * panR;
+                                    const grainSampleL = (grain.buffers[0][readPosition] + noise) * envelope;
+                                    const grainSampleR = isStereo ? (grain.buffers[1][readPosition] + noise) * envelope : grainSampleL;
+
+                                    let pannedL = grainSampleL;
+                                    let pannedR = grainSampleR;
+                                    const panVal = grain.pan;
+
+                                    if (panVal > 0) {
+                                        pannedL *= (1.0 - panVal);
+                                    } else {
+                                        pannedR *= (1.0 + panVal);
+                                    }
+
+                                    leftSample += pannedL;
+                                    rightSample += pannedR;
                                 }
                             }
                         }
-                        output[0][i] = leftSample * 0.5;
-                        output[1][i] = rightSample * 0.5;
+                        output[0][i] = leftSample;
+                        output[1][i] = rightSample;
 
                         for (let g = this.grains.length - 1; g >= 0; g--) {
                             const grain = this.grains[g];
@@ -638,105 +926,112 @@
             }
             registerProcessor('granular-processor', GranularProcessor);
         `;
-
         async function setupAudioChain() {
             try {
-                const blob = new Blob([granularProcessorCode], { type: 'application/javascript' });
+                const blob = new Blob([granularProcessorCode], {
+                    type: 'application/javascript'
+                });
                 const workletURL = URL.createObjectURL(blob);
                 await audioContext.audioWorklet.addModule(workletURL);
-                
-                granularNode = new AudioWorkletNode(audioContext, 'granular-processor', { outputChannelCount: [2] });
+                granularNode = new AudioWorkletNode(audioContext, 'granular-processor', {
+                    outputChannelCount: [2]
+                });
+                effects.inputGain = audioContext.createGain();
                 filterNode = audioContext.createBiquadFilter();
                 pannerNode = audioContext.createStereoPanner();
-
                 const effectConstructors = {
                     granular: () => audioContext.createGain(),
-                    compressor: () => new tuna.Compressor({ bypass: true }),
-                    overdrive: () => new tuna.Overdrive({ bypass: true }),
-                    chorus: () => new tuna.Chorus({ bypass: true }),
-                    phaser: () => new tuna.Phaser({ bypass: true }),
-                    tremolo: () => new tuna.Tremolo({ bypass: true }),
-                    delay: () => new tuna.Delay({ bypass: true }),
-                    reverb: () => new tuna.Convolver({ impulse: document.getElementById('reverb-impulse').value, bypass: true })
+                    compressor: () => new tuna.Compressor({
+                        bypass: true
+                    }),
+                    overdrive: () => new tuna.Overdrive({
+                        bypass: true
+                    }),
+                    chorus: () => new tuna.Chorus({
+                        bypass: true
+                    }),
+                    phaser: () => new tuna.Phaser({
+                        bypass: true
+                    }),
+                    tremolo: () => new tuna.Tremolo({
+                        bypass: true
+                    }),
+                    delay: () => new tuna.Delay({
+                        bypass: true
+                    }),
+                    reverb: () => new tuna.Convolver({
+                        impulse: document.getElementById('reverb-impulse').value,
+                        bypass: true
+                    })
                 };
-
-                const chain = [granularNode, filterNode, pannerNode];
-
+                const chain = [granularNode, effects.inputGain, filterNode, pannerNode];
                 document.querySelectorAll('.effect-group').forEach(group => {
                     const effectName = group.dataset.effect;
                     if (effectConstructors[effectName]) {
                         const effect = effectConstructors[effectName]();
                         effects[effectName] = effect;
                         chain.push(effect);
-
                         const gainNode = audioContext.createGain();
                         effects[effectName + 'Gain'] = gainNode;
                         chain.push(gainNode);
                     }
                 });
-                
                 effects.masterGain = audioContext.createGain();
                 chain.push(effects.masterGain);
                 chain.push(audioContext.destination);
-
                 for (let i = 0; i < chain.length - 1; i++) {
-                    chain[i].connect(chain[i+1]);
+                    chain[i].connect(chain[i + 1]);
                 }
-
             } catch (e) {
                 console.error("Error setting up audio chain:", e);
                 instructions.textContent = "Error: Browser not supported.";
             }
         }
-        
         fileUpload.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (!file) return;
-            if(audioContext.state === 'suspended') audioContext.resume();
-
+            if (audioContext.state === 'suspended') audioContext.resume();
             instructions.textContent = "Loading audio...";
             try {
                 const arrayBuffer = await file.arrayBuffer();
                 audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-                
                 drawWaveform(audioBuffer);
                 if (granularNode) {
                     const channels = [];
                     for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
                         channels.push(audioBuffer.getChannelData(i));
                     }
-                    granularNode.port.postMessage({ buffers: channels });
+                    granularNode.port.postMessage({
+                        buffers: channels
+                    });
                 }
                 instructions.textContent = "Drag on the waveform to play. Drag up/down to filter.";
-            } catch(e) {
+            } catch (e) {
                 alert("Error decoding audio file.");
                 instructions.textContent = "Failed to load audio.";
             }
         });
-        
+
         function handleInteraction(event, touchObject) {
             if (!audioBuffer || !granularNode) return;
-            
+            if (autoplayState.isPlaying) stopAutoplay();
             const interactionSource = touchObject || event;
             const rect = canvas.getBoundingClientRect();
-            
             const x = interactionSource.clientX - rect.left;
             const y = interactionSource.clientY - rect.top;
-
             const playheadPosition = Math.max(0, Math.min(1, x / rect.width));
             granularNode.parameters.get('playhead').setValueAtTime(playheadPosition, audioContext.currentTime);
-            
             const normalizedY = 1 - Math.max(0, Math.min(1, y / rect.height));
             const minFreq = 40;
             const maxFreq = 20000;
             const logFreq = minFreq * Math.pow(maxFreq / minFreq, normalizedY);
             if (filterNode) filterNode.frequency.setTargetAtTime(logFreq, audioContext.currentTime, 0.01);
-
             updatePlayIndicator(x, y);
         }
-        
+
         function startPlayingMouse(e) {
             if (e.target !== canvas || !audioBuffer) return;
+            if (autoplayState.isPlaying) stopAutoplay();
             audioContext.resume();
             isPlaying = true;
             granularNode.parameters.get('playing').setValueAtTime(1, audioContext.currentTime);
@@ -745,14 +1040,13 @@
 
         function handleCanvasTouchStart(e) {
             if (e.target !== canvas || !audioBuffer) return;
+            if (autoplayState.isPlaying) stopAutoplay();
             e.preventDefault();
             const soundControlTouch = e.changedTouches[0];
             activeCanvasTouchId = soundControlTouch.identifier;
-
             audioContext.resume();
             isPlaying = true;
             granularNode.parameters.get('playing').setValueAtTime(1, audioContext.currentTime);
-            
             handleInteraction(e, soundControlTouch);
         }
 
@@ -777,7 +1071,7 @@
                 }
             }
         }
-        
+
         function stopPlaying() {
             if (!isPlaying) return;
             isPlaying = false;
@@ -785,55 +1079,172 @@
             if (filterNode) filterNode.frequency.setTargetAtTime(20000, audioContext.currentTime, 0.01);
             hidePlayIndicator();
         }
-
         canvas.addEventListener('mousedown', startPlayingMouse);
         canvas.addEventListener('mousemove', (e) => isPlaying && activeCanvasTouchId === null && handleInteraction(e));
         canvas.addEventListener('mouseup', stopPlaying);
         canvas.addEventListener('mouseleave', stopPlaying);
-        canvas.addEventListener('touchstart', handleCanvasTouchStart, { passive: false });
-        canvas.addEventListener('touchmove', handleCanvasTouchMove, { passive: false });
+        canvas.addEventListener('touchstart', handleCanvasTouchStart, {
+            passive: false
+        });
+        canvas.addEventListener('touchmove', handleCanvasTouchMove, {
+            passive: false
+        });
         canvas.addEventListener('touchend', handleCanvasTouchEnd);
-
         const tunaMappings = {
-            'compThreshold': { node: 'compressor', param: 'threshold' },
-            'compRatio': { node: 'compressor', param: 'ratio' },
-            'compKnee': { node: 'compressor', param: 'knee' },
-            'compAttack': { node: 'compressor', param: 'attack' },
-            'compRelease': { node: 'compressor', param: 'release' },
-            'compMakeupGain': { node: 'compressor', param: 'makeupGain' },
-            'compAutomakeup': { node: 'compressor', param: 'automakeup', type: 'bool' },
-            'overdriveDrive': { node: 'overdrive', param: 'drive' },
-            'overdriveOutputGain': { node: 'overdrive', param: 'outputGain' },
-            'overdriveCurveAmount': { node: 'overdrive', param: 'curveAmount' },
-            'overdriveAlgorithmIndex': { node: 'overdrive', param: 'algorithmIndex' },
-            'chorusRate': { node: 'chorus', param: 'rate' },
-            'chorusDepth': { node: 'chorus', param: 'depth' },
-            'chorusFeedback': { node: 'chorus', param: 'feedback' },
-            'chorusDelay': { node: 'chorus', param: 'delay' },
-            'phaserRate': { node: 'phaser', param: 'rate' },
-            'phaserDepth': { node: 'phaser', param: 'depth' },
-            'phaserFeedback': { node: 'phaser', param: 'feedback' },
-            'phaserStereoPhase': { node: 'phaser', param: 'stereoPhase' },
-            'phaserBaseModulationFrequency': { node: 'phaser', param: 'baseModulationFrequency' },
-            'tremoloIntensity': { node: 'tremolo', param: 'intensity' },
-            'tremoloRate': { node: 'tremolo', param: 'rate' },
-            'tremoloStereoPhase': { node: 'tremolo', param: 'stereoPhase' },
-            'delayTime': { node: 'delay', param: 'delayTime' },
-            'delayFeedback': { node: 'delay', param: 'feedback' },
-            'delayCutoff': { node: 'delay', param: 'cutoff' },
-            'delayMix': { node: 'delay', param: 'wetLevel' },
-            'reverbWetLevel': { node: 'reverb', param: 'wetLevel' },
-            'reverbDryLevel': { node: 'reverb', param: 'dryLevel' },
-            'reverbLevel': { node: 'reverb', param: 'level' },
-            'reverbHighCut': { node: 'reverb', param: 'highCut' },
-            'reverbLowCut': { node: 'reverb', param: 'lowCut' }
+            'compThreshold': {
+                node: 'compressor',
+                param: 'threshold'
+            },
+            'compRatio': {
+                node: 'compressor',
+                param: 'ratio'
+            },
+            'compKnee': {
+                node: 'compressor',
+                param: 'knee'
+            },
+            'compAttack': {
+                node: 'compressor',
+                param: 'attack'
+            },
+            'compRelease': {
+                node: 'compressor',
+                param: 'release'
+            },
+            'compMakeupGain': {
+                node: 'compressor',
+                param: 'makeupGain'
+            },
+            'compAutomakeup': {
+                node: 'compressor',
+                param: 'automakeup',
+                type: 'bool'
+            },
+            'overdriveDrive': {
+                node: 'overdrive',
+                param: 'drive'
+            },
+            'overdriveOutputGain': {
+                node: 'overdrive',
+                param: 'outputGain'
+            },
+            'overdriveCurveAmount': {
+                node: 'overdrive',
+                param: 'curveAmount'
+            },
+            'overdriveAlgorithmIndex': {
+                node: 'overdrive',
+                param: 'algorithmIndex'
+            },
+            'chorusRate': {
+                node: 'chorus',
+                param: 'rate'
+            },
+            'chorusDepth': {
+                node: 'chorus',
+                param: 'depth'
+            },
+            'chorusFeedback': {
+                node: 'chorus',
+                param: 'feedback'
+            },
+            'chorusDelay': {
+                node: 'chorus',
+                param: 'delay'
+            },
+            'phaserRate': {
+                node: 'phaser',
+                param: 'rate'
+            },
+            'phaserDepth': {
+                node: 'phaser',
+                param: 'depth'
+            },
+            'phaserFeedback': {
+                node: 'phaser',
+                param: 'feedback'
+            },
+            'phaserStereoPhase': {
+                node: 'phaser',
+                param: 'stereoPhase'
+            },
+            'phaserBaseModulationFrequency': {
+                node: 'phaser',
+                param: 'baseModulationFrequency'
+            },
+            'tremoloIntensity': {
+                node: 'tremolo',
+                param: 'intensity'
+            },
+            'tremoloRate': {
+                node: 'tremolo',
+                param: 'rate'
+            },
+            'tremoloStereoPhase': {
+                node: 'tremolo',
+                param: 'stereoPhase'
+            },
+            'delayTime': {
+                node: 'delay',
+                param: 'delayTime'
+            },
+            'delayFeedback': {
+                node: 'delay',
+                param: 'feedback'
+            },
+            'delayCutoff': {
+                node: 'delay',
+                param: 'cutoff'
+            },
+            'delayMix': {
+                node: 'delay',
+                param: 'wetLevel'
+            },
+            'reverbWetLevel': {
+                node: 'reverb',
+                param: 'wetLevel'
+            },
+            'reverbDryLevel': {
+                node: 'reverb',
+                param: 'dryLevel'
+            },
+            'reverbLevel': {
+                node: 'reverb',
+                param: 'level'
+            },
+            'reverbHighCut': {
+                node: 'reverb',
+                param: 'highCut'
+            },
+            'reverbLowCut': {
+                node: 'reverb',
+                param: 'lowCut'
+            }
         };
 
         function updateAudioParameter(id, value) {
             if (!granularNode) return;
             const paramName = id.replace(/-./g, x => x[1].toUpperCase());
-
-            if (granularNode.parameters.has(paramName)) {
+            if (paramName === 'inputGain') {
+                effects.inputGain.gain.setTargetAtTime(value, audioContext.currentTime, 0.01);
+            } else if (paramName === 'previewFilterType') {
+                const types = ['lowpass', 'highpass', 'bandpass', 'lowshelf', 'highshelf', 'peaking', 'notch', 'allpass'];
+                if (filterNode) filterNode.type = types[Math.round(value)];
+            } else if (paramName === 'previewFilterQ') {
+                if (filterNode) filterNode.Q.setTargetAtTime(value, audioContext.currentTime, 0.01);
+            } else if (paramName === 'autoplayCropStart') {
+                autoplayState.cropStart = value;
+                updateCropOverlays();
+            } else if (paramName === 'autoplayCropEnd') {
+                autoplayState.cropEnd = value;
+                updateCropOverlays();
+            } else if (paramName === 'autoplaySpeed') {
+                autoplayState.speed = value;
+            } else if (paramName === 'autoplayVerticalPos') {
+                autoplayState.verticalPos = value;
+            } else if (paramName === 'autoplayDirection') {
+                autoplayState.direction = value;
+            } else if (granularNode.parameters.has(paramName)) {
                 granularNode.parameters.get(paramName).setTargetAtTime(value, audioContext.currentTime, 0.01);
             } else if (paramName === 'pan' && pannerNode) {
                 pannerNode.pan.setTargetAtTime(value, audioContext.currentTime, 0.01);
@@ -849,12 +1260,10 @@
                 }
             }
         }
-
         document.getElementById('load-reverb-impulse').addEventListener('click', () => {
             const url = document.getElementById('reverb-impulse').value;
             if (effects.reverb) effects.reverb.loadImpulse(url);
         });
-
         document.getElementById('stop-delay-btn').addEventListener('click', () => {
             const feedbackKnob = document.querySelector('.knob-container[data-id="delay-feedback"]');
             const mixKnob = document.querySelector('.knob-container[data-id="delay-mix"]');
@@ -865,9 +1274,8 @@
                 mixKnob.setValue(0);
             }
         });
-
         recordBtn.addEventListener('click', toggleRecording);
-        
+
         function drawWaveform(buffer) {
             const data = buffer.getChannelData(0);
             const step = Math.ceil(data.length / canvas.width);
@@ -875,15 +1283,14 @@
             const theme = document.body.getAttribute('data-theme');
             const waveColor = theme === 'light' ? '#1a73e8' : '#8ab4f8';
             const bgColor = theme === 'light' ? '#ffffff' : '#202124';
-
             ctx.fillStyle = bgColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.lineWidth = 1;
             ctx.strokeStyle = waveColor;
             ctx.beginPath();
-
             for (let i = 0; i < canvas.width; i++) {
-                let min = 1.0, max = -1.0;
+                let min = 1.0,
+                    max = -1.0;
                 for (let j = 0; j < step; j++) {
                     const datum = data[(i * step) + j];
                     if (datum < min) min = datum;
@@ -985,7 +1392,9 @@
             writeString(view, 36, 'data');
             view.setUint32(40, pcmData.length * 2, true);
             for (let i = 0; i < pcmData.length; i++) view.setInt16(44 + i * 2, pcmData[i], true);
-            const blob = new Blob([view], { type: 'audio/wav' });
+            const blob = new Blob([view], {
+                type: 'audio/wav'
+            });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';
@@ -996,7 +1405,6 @@
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
         }
-
         resetBtn.addEventListener('click', () => {
             document.querySelectorAll('.knob-container').forEach(knob => {
                 const defaultValue = parseFloat(knob.dataset.defaultValue);
@@ -1013,13 +1421,12 @@
         function setupDraggableCanvas() {
             const canvasContainer = document.getElementById('canvas-container');
             const dragHandle = document.getElementById('drag-handle-rect');
-            let canvasX = 0, canvasY = 0;
-
+            let canvasX = 0,
+                canvasY = 0;
             const onDragStart = (startX, startY) => {
                 dragHandle.style.cursor = 'grabbing';
                 const initialCanvasX = canvasX;
                 const initialCanvasY = canvasY;
-                
                 const onDrag = (currentX, currentY) => {
                     const dx = currentX - startX;
                     const dy = currentY - startY;
@@ -1029,7 +1436,6 @@
                 };
                 return onDrag;
             };
-
             dragHandle.addEventListener('mousedown', e => {
                 const onDrag = onDragStart(e.clientX, e.clientY);
                 const onMouseMove = (moveEvent) => onDrag(moveEvent.clientX, moveEvent.clientY);
@@ -1041,12 +1447,10 @@
                 document.addEventListener('mousemove', onMouseMove);
                 document.addEventListener('mouseup', onMouseUp);
             });
-
             dragHandle.addEventListener('touchstart', e => {
                 const touch = e.changedTouches[0];
                 const touchId = touch.identifier;
                 const onDrag = onDragStart(touch.clientX, touch.clientY);
-
                 const onTouchMove = (moveEvent) => {
                     for (const t of moveEvent.changedTouches) {
                         if (t.identifier === touchId) {
@@ -1056,7 +1460,6 @@
                         }
                     }
                 };
-
                 const onTouchEnd = (endEvent) => {
                     for (const t of endEvent.changedTouches) {
                         if (t.identifier === touchId) {
@@ -1067,11 +1470,13 @@
                         }
                     }
                 };
-
-                document.addEventListener('touchmove', onTouchMove, { passive: false });
+                document.addEventListener('touchmove', onTouchMove, {
+                    passive: false
+                });
                 document.addEventListener('touchend', onTouchEnd);
-            }, { passive: false });
-
+            }, {
+                passive: false
+            });
             let lastTap = 0;
             dragHandle.addEventListener('dblclick', resetCanvasPosition);
             dragHandle.addEventListener('touchend', (e) => {
@@ -1101,46 +1506,38 @@
                 let value = parseFloat(container.dataset.value);
                 container.dataset.defaultValue = value;
                 const id = container.dataset.id;
-
                 const svgNS = "http://www.w3.org/2000/svg";
                 const svg = document.createElementNS(svgNS, "svg");
                 svg.setAttribute("viewBox", "0 0 100 100");
-                
                 const track = document.createElementNS(svgNS, "circle");
                 track.setAttribute("class", "knob-track");
                 track.setAttribute("cx", "50");
                 track.setAttribute("cy", "50");
                 track.setAttribute("r", "40");
-                
                 const fill = document.createElementNS(svgNS, "circle");
                 fill.setAttribute("class", "knob-fill");
                 fill.setAttribute("cx", "50");
                 fill.setAttribute("cy", "50");
                 fill.setAttribute("r", "40");
-                
                 const circumference = 2 * Math.PI * 40;
                 const totalAngle = 270;
                 const arcLength = (circumference * totalAngle) / 360;
                 track.setAttribute("stroke-dasharray", `${arcLength} ${circumference - arcLength}`);
                 fill.setAttribute("stroke-dashoffset", circumference);
-
                 svg.appendChild(track);
                 svg.appendChild(fill);
                 container.appendChild(svg);
-
                 const updateFill = (val) => {
                     const percentage = (val - min) / (max - min);
                     const fillLength = arcLength * percentage;
                     fill.setAttribute("stroke-dasharray", `${fillLength} ${circumference - fillLength}`);
                 };
-
                 container.setValue = (newValue) => {
                     value = Math.max(min, Math.min(max, newValue));
                     container.dataset.value = value;
                     updateFill(value);
                     updateAudioParameter(id, value);
                 };
-
                 const onDragStart = (startX) => {
                     const valueOnStart = value;
                     const onDrag = (currentX) => {
@@ -1151,7 +1548,6 @@
                     };
                     return onDrag;
                 };
-
                 container.addEventListener('mousedown', e => {
                     const onDrag = onDragStart(e.clientX);
                     const onMouseMove = (moveEvent) => onDrag(moveEvent.clientX);
@@ -1162,13 +1558,13 @@
                     document.addEventListener('mousemove', onMouseMove);
                     document.addEventListener('mouseup', onMouseUp);
                 });
-
                 container.addEventListener('touchstart', e => {
                     const touch = e.changedTouches[0];
                     const touchId = touch.identifier;
                     const onDrag = onDragStart(touch.clientX);
                     const onTouchMove = (moveEvent) => {
-                        for (const t of moveEvent.changedTouches) if (t.identifier === touchId) onDrag(t.clientX);
+                        for (const t of moveEvent.changedTouches)
+                            if (t.identifier === touchId) onDrag(t.clientX);
                     };
                     const onTouchEnd = (endEvent) => {
                         for (const t of endEvent.changedTouches) {
@@ -1178,14 +1574,16 @@
                             }
                         }
                     };
-                    document.addEventListener('touchmove', onTouchMove, { passive: false });
+                    document.addEventListener('touchmove', onTouchMove, {
+                        passive: false
+                    });
                     document.addEventListener('touchend', onTouchEnd);
-                }, { passive: false });
-
+                }, {
+                    passive: false
+                });
                 container.addEventListener('dblclick', () => {
                     container.setValue(parseFloat(container.dataset.defaultValue));
                 });
-
                 container.setValue(value);
             });
         }
@@ -1194,14 +1592,16 @@
             document.querySelectorAll('.square-slider-container').forEach(slider => {
                 const fill = slider.querySelector('.square-slider-fill');
                 let didDrag = false;
-
                 slider.updateState = (checked, applyTransition = true) => {
                     slider.dataset.checked = checked;
                     fill.style.transition = applyTransition ? 'transform 0.2s' : 'none';
                     fill.style.transform = `scaleX(${checked ? 1 : 0})`;
-                    slider.dispatchEvent(new CustomEvent('statechange', { detail: { checked } }));
+                    slider.dispatchEvent(new CustomEvent('statechange', {
+                        detail: {
+                            checked
+                        }
+                    }));
                 };
-
                 const onDragStart = (startX) => {
                     const startChecked = slider.dataset.checked === 'true';
                     const onDrag = (currentX) => {
@@ -1219,12 +1619,17 @@
                             slider.updateState(deltaX > 0);
                         }
                     };
-                    return { onDrag, onDragEnd };
+                    return {
+                        onDrag,
+                        onDragEnd
+                    };
                 };
-
                 slider.addEventListener('mousedown', e => {
                     didDrag = false;
-                    const { onDrag, onDragEnd } = onDragStart(e.clientX);
+                    const {
+                        onDrag,
+                        onDragEnd
+                    } = onDragStart(e.clientX);
                     const onMouseMove = (moveEvent) => onDrag(moveEvent.clientX);
                     const onMouseUp = (upEvent) => {
                         document.removeEventListener('mousemove', onMouseMove);
@@ -1234,14 +1639,17 @@
                     document.addEventListener('mousemove', onMouseMove);
                     document.addEventListener('mouseup', onMouseUp);
                 });
-
                 slider.addEventListener('touchstart', e => {
                     didDrag = false;
                     const touch = e.changedTouches[0];
                     const touchId = touch.identifier;
-                    const { onDrag, onDragEnd } = onDragStart(touch.clientX);
+                    const {
+                        onDrag,
+                        onDragEnd
+                    } = onDragStart(touch.clientX);
                     const onTouchMove = (moveEvent) => {
-                        for (const t of moveEvent.changedTouches) if (t.identifier === touchId) onDrag(t.clientX);
+                        for (const t of moveEvent.changedTouches)
+                            if (t.identifier === touchId) onDrag(t.clientX);
                     };
                     const onTouchEnd = (endEvent) => {
                         for (const t of endEvent.changedTouches) {
@@ -1252,16 +1660,18 @@
                             }
                         }
                     };
-                    document.addEventListener('touchmove', onTouchMove, { passive: false });
+                    document.addEventListener('touchmove', onTouchMove, {
+                        passive: false
+                    });
                     document.addEventListener('touchend', onTouchEnd);
-                }, { passive: false });
-
+                }, {
+                    passive: false
+                });
                 slider.addEventListener('click', (e) => {
                     if (!didDrag) {
                         slider.updateState(slider.dataset.checked !== 'true');
                     }
                 });
-
                 slider.addEventListener('statechange', (e) => {
                     const checked = e.detail.checked;
                     const id = slider.dataset.id;
@@ -1273,14 +1683,21 @@
                     }
                     if (slider.classList.contains('group-toggle')) {
                         const group = slider.closest('.effect-group');
-                        group.querySelector('.effect-controls').style.display = checked ? 'grid' : 'none';
                         const effectName = group.dataset.effect;
-                        if (effects[effectName]) effects[effectName].bypass = !checked;
+                        const controls = group.querySelector('.effect-controls');
+                        if (controls) controls.style.display = checked ? 'grid' : 'none';
+                        if (effectName !== 'input' && effects[effectName]) {
+                            effects[effectName].bypass = !checked;
+                        }
                         return;
                     }
                     const paramName = id.replace(/-./g, x => x[1].toUpperCase());
                     if (paramName === 'pitchSync') {
                         if (granularNode) granularNode.parameters.get('pitchSync').setValueAtTime(checked ? 1 : 0, audioContext.currentTime);
+                        return;
+                    }
+                    if (paramName === 'autoplayDirection') {
+                        updateAudioParameter(id, checked);
                         return;
                     }
                     const mapping = tunaMappings[paramName];
@@ -1294,7 +1711,6 @@
             const container = document.querySelector('.container');
             const scrollbar = document.getElementById('custom-scrollbar');
             const thumb = document.getElementById('scrollbar-thumb');
-
             const updateThumb = () => {
                 const scrollableHeight = container.scrollHeight - container.clientHeight;
                 if (scrollableHeight <= 0) {
@@ -1305,20 +1721,16 @@
                 const trackHeight = scrollbar.clientHeight;
                 const thumbHeight = Math.max(20, (container.clientHeight / container.scrollHeight) * trackHeight);
                 thumb.style.height = `${thumbHeight}px`;
-
                 const scrollPercentage = container.scrollTop / scrollableHeight;
                 const thumbTop = scrollPercentage * (trackHeight - thumbHeight);
                 thumb.style.top = `${thumbTop}px`;
             };
-
             container.addEventListener('scroll', updateThumb);
             new ResizeObserver(updateThumb).observe(container);
-
             const onDragStart = (startY) => {
                 const initialScrollTop = container.scrollTop;
                 const trackHeight = scrollbar.clientHeight;
                 const thumbHeight = thumb.offsetHeight;
-                
                 const onDrag = (currentY) => {
                     const deltaY = currentY - startY;
                     const scrollableHeight = container.scrollHeight - container.clientHeight;
@@ -1327,7 +1739,6 @@
                 };
                 return onDrag;
             };
-
             thumb.addEventListener('mousedown', e => {
                 e.stopPropagation();
                 const onDrag = onDragStart(e.clientY);
@@ -1339,14 +1750,14 @@
                 document.addEventListener('mousemove', onMouseMove);
                 document.addEventListener('mouseup', onMouseUp);
             });
-
             thumb.addEventListener('touchstart', e => {
                 e.stopPropagation();
                 const touch = e.changedTouches[0];
                 const touchId = touch.identifier;
                 const onDrag = onDragStart(touch.clientY);
                 const onTouchMove = (moveEvent) => {
-                    for (const t of moveEvent.changedTouches) if (t.identifier === touchId) onDrag(t.clientY);
+                    for (const t of moveEvent.changedTouches)
+                        if (t.identifier === touchId) onDrag(t.clientY);
                 };
                 const onTouchEnd = (endEvent) => {
                     for (const t of endEvent.changedTouches) {
@@ -1356,23 +1767,104 @@
                         }
                     }
                 };
-                document.addEventListener('touchmove', onTouchMove, { passive: false });
+                document.addEventListener('touchmove', onTouchMove, {
+                    passive: false
+                });
                 document.addEventListener('touchend', onTouchEnd);
-            }, { passive: false });
+            }, {
+                passive: false
+            });
         }
 
+        function updateCropOverlays() {
+            if (autoplayState.cropStart >= autoplayState.cropEnd) {
+                const startKnob = document.querySelector('.knob-container[data-id="autoplay-crop-start"]');
+                const endKnob = document.querySelector('.knob-container[data-id="autoplay-crop-end"]');
+                if (startKnob && endKnob) {
+                    const temp = autoplayState.cropStart;
+                    startKnob.setValue(autoplayState.cropEnd);
+                    endKnob.setValue(temp);
+                }
+            }
+            cropOverlayStart.style.width = `${autoplayState.cropStart * 100}%`;
+            cropOverlayEnd.style.width = `${(1 - autoplayState.cropEnd) * 100}%`;
+        }
+
+        function autoplayLoop(timestamp) {
+            if (!autoplayState.isPlaying || !audioBuffer) return;
+            const elapsedTime = (timestamp - autoplayState.startTime) / 1000;
+            const cropRange = autoplayState.cropEnd - autoplayState.cropStart;
+            if (cropRange <= 0) {
+                autoplayState.frameId = requestAnimationFrame(autoplayLoop);
+                return;
+            }
+            const loopDuration = (audioBuffer.duration * cropRange) / autoplayState.speed;
+            let progressInLoop = (elapsedTime % loopDuration) / loopDuration;
+            if (autoplayState.direction) { // RTL
+                progressInLoop = 1 - progressInLoop;
+            }
+            const playheadPosition = autoplayState.cropStart + (progressInLoop * cropRange);
+            granularNode.parameters.get('playhead').setTargetAtTime(playheadPosition, audioContext.currentTime, 0.01);
+            const rect = canvas.getBoundingClientRect();
+            const x = playheadPosition * rect.width;
+            const y = (1 - autoplayState.verticalPos) * rect.height;
+            const normalizedY = autoplayState.verticalPos;
+            const minFreq = 40;
+            const maxFreq = 20000;
+            const logFreq = minFreq * Math.pow(maxFreq / minFreq, normalizedY);
+            if (filterNode) filterNode.frequency.setTargetAtTime(logFreq, audioContext.currentTime, 0.01);
+            updatePlayIndicator(x, y);
+            autoplayState.frameId = requestAnimationFrame(autoplayLoop);
+        }
+
+        function startAutoplay() {
+            if (!audioBuffer) {
+                alert("Please upload an audio file first.");
+                return;
+            }
+            if (isPlaying) stopPlaying();
+            autoplayState.isPlaying = true;
+            autoplayBtn.textContent = 'Stop Autoplay';
+            autoplayBtn.classList.add('playing');
+            audioContext.resume();
+            granularNode.parameters.get('playing').setValueAtTime(1, audioContext.currentTime);
+            autoplayState.startTime = performance.now();
+            autoplayState.frameId = requestAnimationFrame(autoplayLoop);
+        }
+
+        function stopAutoplay() {
+            if (!autoplayState.isPlaying) return;
+            autoplayState.isPlaying = false;
+            autoplayBtn.textContent = 'Autoplay';
+            autoplayBtn.classList.remove('playing');
+            if (autoplayState.frameId) {
+                cancelAnimationFrame(autoplayState.frameId);
+                autoplayState.frameId = null;
+            }
+            granularNode.parameters.get('playing').setValueAtTime(0, audioContext.currentTime);
+            hidePlayIndicator();
+        }
+        autoplayBtn.addEventListener('click', () => {
+            if (autoplayState.isPlaying) {
+                stopAutoplay();
+            } else {
+                startAutoplay();
+            }
+        });
         window.onload = () => {
-             const dpr = window.devicePixelRatio || 1;
-             const rect = canvas.getBoundingClientRect();
-             canvas.width = rect.width * dpr;
-             canvas.height = rect.height * dpr;
-             ctx.scale(dpr, dpr);
-             setupAudioChain();
-             setupDraggableCanvas();
-             setupKnobs();
-             setupSquareSliders();
-             setupCustomScrollbar();
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            setupAudioChain();
+            setupDraggableCanvas();
+            setupKnobs();
+            setupSquareSliders();
+            setupCustomScrollbar();
+            updateCropOverlays();
         };
     </script>
 </body>
+
 </html>
