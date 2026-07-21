@@ -195,6 +195,7 @@
             position: relative;
             overflow: hidden;
             border-radius: 8px 8px 0 0;
+            touch-action: none;
         }
 
         #waveform-canvas {
@@ -203,6 +204,7 @@
             background-color: var(--bg);
             cursor: crosshair;
             display: block;
+            touch-action: none;
         }
 
         .crop-overlay {
@@ -270,6 +272,7 @@
             flex-direction: column;
             gap: 8px;
             align-items: center;
+            touch-action: none;
         }
 
         .control label {
@@ -283,12 +286,14 @@
             width: 50px;
             height: 50px;
             cursor: ew-resize;
+            touch-action: none;
         }
 
         .knob-container svg {
             width: 100%;
             height: 100%;
             transform: rotate(135deg);
+            pointer-events: none;
         }
 
         .knob-track,
@@ -314,6 +319,7 @@
             cursor: pointer;
             border-radius: 12px;
             overflow: hidden;
+            touch-action: manipulation;
         }
 
         .square-slider-fill {
@@ -359,6 +365,7 @@
             align-items: center;
             justify-content: center;
             text-decoration: none;
+            touch-action: manipulation;
         }
 
         .file-upload-wrapper {
@@ -539,6 +546,9 @@
         </div>
     </div>
     <script>
+        // Multi-touch tracking
+        const activeTouches = new Map();
+        
         // Initialize Audio Context
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         let audioBuffer = null;
@@ -824,6 +834,9 @@
 
         // Draw Waveform
         function drawWaveform(buffer) {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
             const width = canvas.width;
             const height = canvas.height;
             ctx.fillStyle = getComputedStyle(canvas).backgroundColor;
@@ -834,6 +847,7 @@
             const amp = height / 2;
 
             ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+            ctx.lineWidth = 1;
             ctx.beginPath();
 
             for (let i = 0; i < width; i++) {
@@ -858,7 +872,6 @@
             const normalizedValue = (value - min) / (max - min);
             const startAngle = Math.PI * 0.75;
             const endAngle = Math.PI * 2.25;
-            const angle = startAngle + (endAngle - startAngle) * normalizedValue;
 
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', '0 0 100 100');
@@ -886,34 +899,64 @@
         // Initialize all knobs and controls
         document.querySelectorAll('.knob-container').forEach(container => {
             renderKnob(container);
-            container.addEventListener('pointerdown', handleKnobDrag);
+            container.addEventListener('pointerdown', handleKnobStart);
+            container.addEventListener('touchstart', handleKnobStart, { passive: false });
         });
 
-        // Knob Drag Handler
-        function handleKnobDrag(e) {
+        // Knob Start Handler - Multi-touch support
+        function handleKnobStart(e) {
+            e.preventDefault();
             const container = e.currentTarget;
+            const pointerId = e.pointerId !== undefined ? e.pointerId : 'touch-' + (e.touches ? e.touches[0].identifier : 0);
+            
             const min = parseFloat(container.dataset.min);
             const max = parseFloat(container.dataset.max);
             const step = parseFloat(container.dataset.step) || (max - min) / 100;
             let currentValue = parseFloat(container.dataset.value);
+            const startX = e.clientX || e.touches[0].clientX;
+            const startY = e.clientY || e.touches[0].clientY;
+
+            activeTouches.set(pointerId, {
+                type: 'knob',
+                container,
+                min, max, step,
+                startValue: currentValue,
+                startX, startY
+            });
 
             function onMove(moveEvent) {
-                const deltaX = moveEvent.clientX - e.clientX;
-                currentValue = Math.max(min, Math.min(max, currentValue + (deltaX / 100) * step));
+                const touch = activeTouches.get(pointerId);
+                if (!touch) return;
+
+                const clientX = moveEvent.clientX || moveEvent.touches?.[0]?.clientX;
+                const clientY = moveEvent.clientY || moveEvent.touches?.[0]?.clientY;
+                
+                if (!clientX) return;
+
+                const deltaX = clientX - touch.startX;
+                const deltaY = moveEvent.clientY || moveEvent.touches?.[0]?.clientY - touch.startY;
+                
+                // X: horizontal fine control, Y: vertical coarse control
+                const delta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY * 2;
+                currentValue = Math.max(touch.min, Math.min(touch.max, touch.startValue + (delta / 100) * touch.step));
+                
                 container.dataset.value = currentValue;
                 renderKnob(container);
-                
                 updateAudioParameter(container.dataset.id, currentValue);
             }
 
             function onEnd() {
+                activeTouches.delete(pointerId);
                 document.removeEventListener('pointermove', onMove);
+                document.removeEventListener('touchmove', onMove);
                 document.removeEventListener('pointerup', onEnd);
+                document.removeEventListener('touchend', onEnd);
             }
 
             document.addEventListener('pointermove', onMove);
+            document.addEventListener('touchmove', onMove, { passive: false });
             document.addEventListener('pointerup', onEnd);
-            e.preventDefault();
+            document.addEventListener('touchend', onEnd);
         }
 
         // Update Audio Parameters
@@ -934,7 +977,11 @@
                 'reverse-chance': { param: 'reverseChance' },
                 'noise-amount': { param: 'noiseAmount' },
                 'noise-type': { param: 'noiseType' },
-                'pitch-sync': { param: 'pitchSync' }
+                'pitch-sync': { param: 'pitchSync' },
+                'autoplay-crop-start': { param: 'none', fn: () => { autoplayState.cropStart = value; cropOverlayStart.style.width = (value * 100) + '%'; } },
+                'autoplay-crop-end': { param: 'none', fn: () => { autoplayState.cropEnd = value; cropOverlayEnd.style.width = ((1 - value) * 100) + '%'; } },
+                'autoplay-speed': { param: 'none', fn: () => autoplayState.speed = value },
+                'autoplay-vertical-pos': { param: 'none', fn: () => autoplayState.verticalPos = value }
             };
 
             const mapping = paramMapping[id];
@@ -946,24 +993,137 @@
             }
         }
 
-        // Square Slider Handler
+        // Square Slider Handler - Multi-touch support
         document.querySelectorAll('.square-slider-container').forEach(slider => {
-            slider.addEventListener('click', (e) => {
-                const checked = slider.dataset.checked === 'true';
-                slider.dataset.checked = !checked;
-                
-                if (slider.dataset.id === 'theme-toggle') {
-                    const theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
-                    document.body.dataset.theme = theme;
-                }
-                
-                const groupToggle = slider.closest('.effect-group');
-                if (groupToggle && slider.classList.contains('group-toggle')) {
-                    const controls = groupToggle.querySelector('.effect-controls');
-                    controls.style.display = checked ? 'none' : 'grid';
-                }
-            });
+            slider.addEventListener('pointerdown', handleSliderClick);
+            slider.addEventListener('touchstart', handleSliderClick, { passive: false });
         });
+
+        function handleSliderClick(e) {
+            e.preventDefault();
+            const slider = e.currentTarget;
+            const checked = slider.dataset.checked === 'true';
+            slider.dataset.checked = !checked;
+            
+            if (slider.dataset.id === 'theme-toggle') {
+                const theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+                document.body.dataset.theme = theme;
+            }
+            
+            const groupToggle = slider.closest('.effect-group');
+            if (groupToggle && slider.classList.contains('group-toggle')) {
+                const controls = groupToggle.querySelector('.effect-controls');
+                controls.style.display = checked ? 'none' : 'grid';
+            }
+        }
+
+        // Canvas X-Y interaction
+        canvas.addEventListener('pointerdown', handleCanvasStart);
+        canvas.addEventListener('touchstart', handleCanvasStart, { passive: false });
+
+        function handleCanvasStart(e) {
+            e.preventDefault();
+            if (!audioBuffer || !granularNode) return;
+
+            const pointerId = e.pointerId !== undefined ? e.pointerId : 'canvas-' + (e.touches ? e.touches[0].identifier : 0);
+            const rect = canvas.getBoundingClientRect();
+            const startX = (e.clientX || e.touches[0].clientX) - rect.left;
+            const startY = (e.clientY || e.touches[0].clientY) - rect.top;
+
+            activeTouches.set(pointerId, {
+                type: 'canvas',
+                startX, startY,
+                rect
+            });
+
+            function onMove(moveEvent) {
+                const touch = activeTouches.get(pointerId);
+                if (!touch) return;
+
+                const clientX = moveEvent.clientX || moveEvent.touches?.[0]?.clientX;
+                const clientY = moveEvent.clientY || moveEvent.touches?.[0]?.clientY;
+                
+                if (!clientX) return;
+
+                const x = (clientX - touch.rect.left) / touch.rect.width;
+                const y = (clientY - touch.rect.top) / touch.rect.height;
+                
+                const playhead = Math.max(0, Math.min(1, x));
+                const verticalPos = Math.max(0, Math.min(1, y));
+                
+                if (granularNode.parameters.has('playhead')) {
+                    granularNode.parameters.get('playhead').value = playhead;
+                }
+                playIndicatorV.style.left = (playhead * 100) + '%';
+                playIndicatorH.style.top = (verticalPos * 100) + '%';
+            }
+
+            function onEnd() {
+                activeTouches.delete(pointerId);
+                document.removeEventListener('pointermove', onMove);
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('pointerup', onEnd);
+                document.removeEventListener('touchend', onEnd);
+            }
+
+            document.addEventListener('pointermove', onMove);
+            document.addEventListener('touchmove', onMove, { passive: false });
+            document.addEventListener('pointerup', onEnd);
+            document.addEventListener('touchend', onEnd);
+        }
+
+        // Draggable Section Handler - Multi-touch support
+        document.querySelectorAll('.drag-handle').forEach(handle => {
+            handle.addEventListener('pointerdown', handleDragStart);
+            handle.addEventListener('touchstart', handleDragStart, { passive: false });
+        });
+
+        function handleDragStart(e) {
+            e.preventDefault();
+            const handle = e.currentTarget;
+            const section = handle.closest('.draggable-section');
+            const pointerId = e.pointerId !== undefined ? e.pointerId : 'drag-' + (e.touches ? e.touches[0].identifier : 0);
+            
+            const startX = e.clientX || e.touches[0].clientX;
+            const startY = e.clientY || e.touches[0].clientY;
+            let currentX = parseFloat(section.style.transform.match(/translateX\((.+)px\)/) ? section.style.transform.match(/translateX\((.+)px\)/)[1] : 0);
+            let currentY = parseFloat(section.style.transform.match(/translateY\((.+)px\)/) ? section.style.transform.match(/translateY\((.+)px\)/)[1] : 0);
+
+            section.classList.add('is-dragging');
+            activeTouches.set(pointerId, { type: 'drag', section, startX, startY, currentX, currentY });
+
+            function onMove(moveEvent) {
+                const touch = activeTouches.get(pointerId);
+                if (!touch) return;
+
+                const clientX = moveEvent.clientX || moveEvent.touches?.[0]?.clientX;
+                const clientY = moveEvent.clientY || moveEvent.touches?.[0]?.clientY;
+                
+                if (!clientX) return;
+
+                const deltaX = clientX - touch.startX;
+                const deltaY = clientY - touch.startY;
+
+                touch.section.style.transform = `translate(${touch.currentX + deltaX}px, ${touch.currentY + deltaY}px)`;
+            }
+
+            function onEnd() {
+                const touch = activeTouches.get(pointerId);
+                if (touch) {
+                    touch.section.classList.remove('is-dragging');
+                    activeTouches.delete(pointerId);
+                }
+                document.removeEventListener('pointermove', onMove);
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('pointerup', onEnd);
+                document.removeEventListener('touchend', onEnd);
+            }
+
+            document.addEventListener('pointermove', onMove);
+            document.addEventListener('touchmove', onMove, { passive: false });
+            document.addEventListener('pointerup', onEnd);
+            document.addEventListener('touchend', onEnd);
+        }
 
         // Play/Stop Controls
         let currentSource = null;
@@ -1030,16 +1190,13 @@
 
         // Info Button
         document.getElementById('info-btn').addEventListener('click', () => {
-            alert('migrain - Granular Synthesizer\n\nFeatures:\n- Upload audio files\n- Granular synthesis with adjustable parameters\n- Real-time audio processing\n- Light/Dark theme\n\nNo external dependencies.');
+            alert('migrain - Granular Synthesizer\n\nFeatures:\n- Upload audio files\n- Granular synthesis with adjustable parameters\n- Real-time audio processing\n- Light/Dark theme\n- Multi-touch support\n\nNo external dependencies.');
         });
 
-        // Canvas interaction for waveform
-        canvas.addEventListener('click', (e) => {
-            if (!audioBuffer) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width;
-            if (granularNode && granularNode.parameters.has('playhead')) {
-                granularNode.parameters.get('playhead').value = Math.max(0, Math.min(1, x));
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (audioBuffer) {
+                drawWaveform(audioBuffer);
             }
         });
     </script>
