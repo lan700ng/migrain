@@ -6,38 +6,184 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>migrain</title>
     <style>
-        :root {
-            --light-bg: #ffffff;
-            --light-surface: #f1f3f4;
-            --light-text: #202124;
-            --light-text-secondary: #5f6368;
-            --light-outline: #dadce0;
-            --light-accent: #1a73e8;
-            --light-record: #d93025;
-            --dark-bg: #202124;
-            --dark-surface: #303134;
-            --dark-text: #e8eaed;
-            --dark-text-secondary: #9aa0a6;
-            --dark-outline: #5f6368;
-            --dark-accent: #8ab4f8;
-            --dark-record: #f28b82;
-            --bg: var(--dark-bg);
-            --surface: var(--dark-surface);
-            --text: var(--dark-text);
-            --text-secondary: var(--dark-text-secondary);
-            --outline: var(--dark-outline);
-            --accent: var(--dark-accent);
-            --record: var(--dark-record);
+        :root, body[data-palette="github-dark"] {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --text: #c9d1d9;
+            --text-secondary: #8b949e;
+            --outline: #30363d;
+            --accent: #58a6ff;
+            --record: #ff7b72;
         }
 
-        body[data-theme="light"] {
-            --bg: var(--light-bg);
-            --surface: var(--light-surface);
-            --text: var(--light-text);
-            --text-secondary: var(--light-text-secondary);
-            --outline: var(--light-outline);
-            --accent: var(--light-accent);
-            --record: var(--light-record);
+        body[data-palette="github-light"] {
+            --bg: #ffffff;
+            --surface: #f6f8fa;
+            --text: #24292f;
+            --text-secondary: #57606a;
+            --outline: #d0d7de;
+            --accent: #0969da;
+            --record: #cf222e;
+        }
+
+        body[data-palette="dracula-dark"] {
+            --bg: #282a36;
+            --surface: #44475a;
+            --text: #f8f8f2;
+            --text-secondary: #6272a4;
+            --outline: #6272a4;
+            --accent: #bd93f9;
+            --record: #ff5555;
+        }
+
+        body[data-palette="catppuccin-mocha"] {
+            --bg: #1e1e2e;
+            --surface: #313244;
+            --text: #cdd6f4;
+            --text-secondary: #a6adc8;
+            --outline: #585b70;
+            --accent: #cba6f7;
+            --record: #f38ba8;
+        }
+
+        body[data-palette="catppuccin-macchiato"] {
+            --bg: #24273a;
+            --surface: #363a4f;
+            --text: #cad3f5;
+            --text-secondary: #a5adcb;
+            --outline: #5b6078;
+            --accent: #c6a0f6;
+            --record: #ed8796;
+        }
+
+        body[data-palette="catppuccin-frappe"] {
+            --bg: #303446;
+            --surface: #414559;
+            --text: #c6d0f5;
+            --text-secondary: #a5adce;
+            --outline: #626880;
+            --accent: #ca9ee6;
+            --record: #e78284;
+        }
+
+        body[data-palette="catppuccin-latte"] {
+            --bg: #eff1f5;
+            --surface: #e6e9ef;
+            --text: #4c4f69;
+            --text-secondary: #6c6f85;
+            --outline: #bcc0cc;
+            --accent: #8839ef;
+            --record: #d20f39;
+        }
+
+        body[data-palette="everforest-dark"] {
+            --bg: #2b3339;
+            --surface: #323c41;
+            --text: #d3c6aa;
+            --text-secondary: #9da9a0;
+            --outline: #4a555b;
+            --accent: #a7c080;
+            --record: #e67e80;
+        }
+
+        body[data-palette="everforest-light"] {
+            --bg: #fdf6e3;
+            --surface: #f4f0d9;
+            --text: #5c6a72;
+            --text-secondary: #829181;
+            --outline: #dfddc8;
+            --accent: #8da101;
+            --record: #f85552;
+        }
+
+        body[data-palette="nord"] {
+            --bg: #2e3440;
+            --surface: #3b4252;
+            --text: #eceff4;
+            --text-secondary: #d8dee9;
+            --outline: #4c566a;
+            --accent: #88c0d0;
+            --record: #bf616a;
+        }
+
+        body[data-palette="gruvbox-dark"] {
+            --bg: #282828;
+            --surface: #3c3836;
+            --text: #ebdbb2;
+            --text-secondary: #a89984;
+            --outline: #504945;
+            --accent: #fe8019;
+            --record: #fb4934;
+        }
+
+        body[data-palette="gruvbox-light"] {
+            --bg: #fbf1c7;
+            --surface: #ebdbb2;
+            --text: #3c3836;
+            --text-secondary: #7c6f64;
+            --outline: #d5c4a1;
+            --accent: #af3a03;
+            --record: #9d0006;
+        }
+
+        body[data-palette="one-dark"] {
+            --bg: #282c34;
+            --surface: #21252b;
+            --text: #abb2bf;
+            --text-secondary: #5c6370;
+            --outline: #3e4451;
+            --accent: #61afef;
+            --record: #e06c75;
+        }
+
+        body[data-palette="monokai"] {
+            --bg: #272822;
+            --surface: #3e3d32;
+            --text: #f8f8f2;
+            --text-secondary: #75715e;
+            --outline: #49483e;
+            --accent: #a6e22e;
+            --record: #f92672;
+        }
+
+        body[data-palette="tokyo-night"] {
+            --bg: #1a1b26;
+            --surface: #24283b;
+            --text: #a9b1d6;
+            --text-secondary: #565f89;
+            --outline: #414868;
+            --accent: #7aa2f7;
+            --record: #f7768e;
+        }
+
+        body[data-palette="rose-pine"] {
+            --bg: #191724;
+            --surface: #1f1d2e;
+            --text: #e0def4;
+            --text-secondary: #908caa;
+            --outline: #26233a;
+            --accent: #c4a7e7;
+            --record: #eb6f92;
+        }
+
+        body[data-palette="solarized-dark"] {
+            --bg: #002b36;
+            --surface: #073642;
+            --text: #839496;
+            --text-secondary: #657b83;
+            --outline: #586e75;
+            --accent: #2aa198;
+            --record: #dc322f;
+        }
+
+        body[data-palette="solarized-light"] {
+            --bg: #fdf6e3;
+            --surface: #eee8d5;
+            --text: #657b83;
+            --text-secondary: #839496;
+            --outline: #93a1a1;
+            --accent: #268bd2;
+            --record: #dc322f;
         }
 
         * {
@@ -229,7 +375,6 @@
             background-color: var(--record);
             pointer-events: none;
             opacity: 0;
-            transition: opacity .1s;
         }
 
         #play-indicator-v {
@@ -263,6 +408,33 @@
             margin-top: 10px;
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             justify-items: center;
+        }
+
+        .palette-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+            gap: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--outline);
+            margin-top: 10px;
+            justify-items: center;
+        }
+
+        .palette-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--outline);
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            padding: 0;
+            outline: none;
+        }
+
+        .palette-btn:hover,
+        .palette-btn.active {
+            transform: scale(1.15);
+            border-color: var(--accent);
         }
 
         .control {
@@ -396,7 +568,7 @@
     </style>
 </head>
 
-<body data-theme="dark">
+<body data-palette="github-dark">
     <div id="main-content">
         <div id="canvas-container" class="draggable-section">
             <div class="drag-handle">𑁋</div>
@@ -418,6 +590,33 @@
                         <div class="square-slider-fill"></div>
                     </div>
                 </div>
+
+                <div class="effect-group" id="palette-menu" style="display: none;">
+                    <div class="effect-header">
+                        <h2>Palette</h2>
+                    </div>
+                    <div class="palette-options">
+                        <button class="palette-btn active" data-palette="github-dark" title="GitHub Dark" style="background: conic-gradient(#0d1117 0 25%, #161b22 25% 50%, #58a6ff 50% 75%, #c9d1d9 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="github-light" title="GitHub Light" style="background: conic-gradient(#ffffff 0 25%, #f6f8fa 25% 50%, #0969da 50% 75%, #24292f 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="dracula-dark" title="Dracula Dark" style="background: conic-gradient(#282a36 0 25%, #44475a 25% 50%, #bd93f9 50% 75%, #f8f8f2 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="catppuccin-mocha" title="Catppuccin Mocha" style="background: conic-gradient(#1e1e2e 0 25%, #313244 25% 50%, #cba6f7 50% 75%, #cdd6f4 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="catppuccin-macchiato" title="Catppuccin Macchiato" style="background: conic-gradient(#24273a 0 25%, #363a4f 25% 50%, #c6a0f6 50% 75%, #cad3f5 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="catppuccin-frappe" title="Catppuccin Frappe" style="background: conic-gradient(#303446 0 25%, #414559 25% 50%, #ca9ee6 50% 75%, #c6d0f5 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="catppuccin-latte" title="Catppuccin Latte" style="background: conic-gradient(#eff1f5 0 25%, #e6e9ef 25% 50%, #8839ef 50% 75%, #4c4f69 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="everforest-dark" title="Everforest Dark" style="background: conic-gradient(#2b3339 0 25%, #323c41 25% 50%, #a7c080 50% 75%, #d3c6aa 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="everforest-light" title="Everforest Light" style="background: conic-gradient(#fdf6e3 0 25%, #f4f0d9 25% 50%, #8da101 50% 75%, #5c6a72 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="nord" title="Nord" style="background: conic-gradient(#2e3440 0 25%, #3b4252 25% 50%, #88c0d0 50% 75%, #eceff4 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="gruvbox-dark" title="Gruvbox Dark" style="background: conic-gradient(#282828 0 25%, #3c3836 25% 50%, #fe8019 50% 75%, #ebdbb2 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="gruvbox-light" title="Gruvbox Light" style="background: conic-gradient(#fbf1c7 0 25%, #ebdbb2 25% 50%, #af3a03 50% 75%, #3c3836 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="one-dark" title="One Dark Pro" style="background: conic-gradient(#282c34 0 25%, #21252b 25% 50%, #61afef 50% 75%, #abb2bf 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="monokai" title="Monokai" style="background: conic-gradient(#272822 0 25%, #3e3d32 25% 50%, #a6e22e 50% 75%, #f8f8f2 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="tokyo-night" title="Tokyo Night" style="background: conic-gradient(#1a1b26 0 25%, #24283b 25% 50%, #7aa2f7 50% 75%, #a9b1d6 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="rose-pine" title="Rosé Pine" style="background: conic-gradient(#191724 0 25%, #1f1d2e 25% 50%, #c4a7e7 50% 75%, #e0def4 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="solarized-dark" title="Solarized Dark" style="background: conic-gradient(#002b36 0 25%, #073642 25% 50%, #2aa198 50% 75%, #839496 75% 100%)"></button>
+                        <button class="palette-btn" data-palette="solarized-light" title="Solarized Light" style="background: conic-gradient(#fdf6e3 0 25%, #eee8d5 25% 50%, #268bd2 50% 75%, #657b83 75% 100%)"></button>
+                    </div>
+                </div>
+
                 <div class="effect-group" data-effect="input">
                     <div class="effect-header">
                         <h2>Input</h2>
@@ -437,6 +636,22 @@
                         <div class="control">
                             <label>Filter Q</label>
                             <div class="knob-container" data-id="preview-filter-q" data-min="0.0001" data-max="30" data-value="1" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Attack</label>
+                            <div class="knob-container" data-id="env-attack" data-min="0.001" data-max="5" data-value="0.01" data-step="0.001"></div>
+                        </div>
+                        <div class="control">
+                            <label>Decay</label>
+                            <div class="knob-container" data-id="env-decay" data-min="0.001" data-max="5" data-value="0.1" data-step="0.001"></div>
+                        </div>
+                        <div class="control">
+                            <label>Sustain</label>
+                            <div class="knob-container" data-id="env-sustain" data-min="0" data-max="1" data-value="1" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Release</label>
+                            <div class="knob-container" data-id="env-release" data-min="0.001" data-max="5" data-value="0.1" data-step="0.001"></div>
                         </div>
                         <div class="autoplay-controls">
                             <div class="control" style="grid-column: 1 / -1; width: 100%;">
@@ -565,9 +780,15 @@
         let recorderNode = null;
         let recordedData = [];
         let effects = {};
+        let adsr = {
+            attack: 0.01,
+            decay: 0.1,
+            sustain: 1.0,
+            release: 0.1
+        };
         let autoplayState = {
             isPlaying: false,
-            direction: false, // false for LTR, true for RTL
+            direction: false,
             cropStart: 0,
             cropEnd: 1,
             speed: 1,
@@ -839,12 +1060,33 @@
             updatePlayIndicator(x, y);
         }
 
+        function startNoteADSR() {
+            if (!audioBuffer || !granularNode || !effects.inputGain) return;
+            isPlaying = true;
+            const now = audioContext.currentTime;
+            granularNode.parameters.get('playing').setValueAtTime(1, now);
+            
+            const gainParam = effects.inputGain.gain;
+            const inputGainKnob = document.querySelector('.knob-container[data-id="input-gain"]');
+            const baseGain = inputGainKnob ? parseFloat(inputGainKnob.dataset.value) : 1.0;
+
+            gainParam.cancelScheduledValues(now);
+            const currentGain = gainParam.value;
+            gainParam.setValueAtTime(currentGain, now);
+
+            const atk = Math.max(0.001, adsr.attack);
+            const dec = Math.max(0.001, adsr.decay);
+            const susGain = baseGain * adsr.sustain;
+
+            gainParam.linearRampToValueAtTime(baseGain, now + atk);
+            gainParam.linearRampToValueAtTime(susGain, now + atk + dec);
+        }
+
         function startPlayingMouse(e) {
             if (e.target !== canvas || !audioBuffer) return;
             if (autoplayState.isPlaying) stopAutoplay();
             audioContext.resume();
-            isPlaying = true;
-            granularNode.parameters.get('playing').setValueAtTime(1, audioContext.currentTime);
+            startNoteADSR();
             handleInteraction(e, null);
         }
 
@@ -855,8 +1097,7 @@
             const soundControlTouch = e.changedTouches[0];
             activeCanvasTouchId = soundControlTouch.identifier;
             audioContext.resume();
-            isPlaying = true;
-            granularNode.parameters.get('playing').setValueAtTime(1, audioContext.currentTime);
+            startNoteADSR();
             handleInteraction(e, soundControlTouch);
         }
 
@@ -885,10 +1126,24 @@
         function stopPlaying() {
             if (!isPlaying) return;
             isPlaying = false;
-            granularNode.parameters.get('playing').setValueAtTime(0, audioContext.currentTime);
-            if (filterNode) filterNode.frequency.setTargetAtTime(20000, audioContext.currentTime, 0.01);
+            
+            const now = audioContext.currentTime;
+            if (filterNode) filterNode.frequency.setTargetAtTime(20000, now, 0.01);
+            
+            if (effects.inputGain && granularNode) {
+                const gainParam = effects.inputGain.gain;
+                gainParam.cancelScheduledValues(now);
+                const currentGain = gainParam.value;
+                gainParam.setValueAtTime(currentGain, now);
+                
+                const rel = Math.max(0.001, adsr.release);
+                gainParam.linearRampToValueAtTime(0, now + rel);
+                
+                granularNode.parameters.get('playing').setValueAtTime(0, now + rel);
+            }
             hidePlayIndicator();
         }
+
         canvas.addEventListener('mousedown', startPlayingMouse);
         canvas.addEventListener('mousemove', (e) => isPlaying && activeCanvasTouchId === null && handleInteraction(e));
         canvas.addEventListener('mouseup', stopPlaying);
@@ -906,6 +1161,14 @@
             const paramName = id.replace(/-./g, x => x[1].toUpperCase());
             if (paramName === 'inputGain') {
                 effects.inputGain.gain.setTargetAtTime(value, audioContext.currentTime, 0.01);
+            } else if (paramName === 'envAttack') {
+                adsr.attack = value;
+            } else if (paramName === 'envDecay') {
+                adsr.decay = value;
+            } else if (paramName === 'envSustain') {
+                adsr.sustain = value;
+            } else if (paramName === 'envRelease') {
+                adsr.release = value;
             } else if (paramName === 'previewFilterType') {
                 const types = ['lowpass', 'highpass', 'bandpass', 'lowshelf', 'highshelf', 'peaking', 'notch', 'allpass'];
                 if (filterNode) filterNode.type = types[Math.round(value)];
@@ -934,17 +1197,21 @@
 
         function drawWaveform(buffer) {
             const data = buffer.getChannelData(0);
-            const step = Math.ceil(data.length / canvas.width);
-            const amp = canvas.height / 2;
-            const theme = document.body.getAttribute('data-theme');
-            const waveColor = theme === 'light' ? '#1a73e8' : '#8ab4f8';
-            const bgColor = theme === 'light' ? '#ffffff' : '#202124';
+            const dpr = window.devicePixelRatio || 1;
+            const width = canvas.width / dpr;
+            const height = canvas.height / dpr;
+            const step = Math.ceil(data.length / width);
+            const amp = height / 2;
+            
+            const waveColor = getComputedStyle(document.body).getPropertyValue('--accent').trim() || '#58a6ff';
+            const bgColor = getComputedStyle(document.body).getPropertyValue('--bg').trim() || '#0d1117';
+            
             ctx.fillStyle = bgColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, width, height);
             ctx.lineWidth = 1;
             ctx.strokeStyle = waveColor;
             ctx.beginPath();
-            for (let i = 0; i < canvas.width; i++) {
+            for (let i = 0; i < width; i++) {
                 let min = 1.0,
                     max = -1.0;
                 for (let j = 0; j < step; j++) {
@@ -959,6 +1226,8 @@
         }
 
         function updatePlayIndicator(x, y) {
+            playIndicatorV.style.transition = 'opacity .05s';
+            playIndicatorH.style.transition = 'opacity .05s';
             playIndicatorV.style.opacity = '1';
             playIndicatorH.style.opacity = '1';
             playIndicatorV.style.transform = `translateX(${Math.round(x)}px)`;
@@ -966,6 +1235,9 @@
         }
 
         function hidePlayIndicator() {
+            const rel = Math.max(0.05, adsr.release);
+            playIndicatorV.style.transition = `opacity ${rel}s ease-out`;
+            playIndicatorH.style.transition = `opacity ${rel}s ease-out`;
             playIndicatorV.style.opacity = '0';
             playIndicatorH.style.opacity = '0';
         }
@@ -1061,6 +1333,19 @@
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
         }
+
+        function setupPaletteMenu() {
+            document.querySelectorAll('.palette-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.palette-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const palette = btn.dataset.palette;
+                    document.body.setAttribute('data-palette', palette);
+                    if (audioBuffer) drawWaveform(audioBuffer);
+                });
+            });
+        }
+
         resetBtn.addEventListener('click', () => {
             document.querySelectorAll('.knob-container').forEach(knob => {
                 const defaultValue = parseFloat(knob.dataset.defaultValue);
@@ -1072,6 +1357,13 @@
                     slider.updateState(defaultChecked);
                 }
             });
+            
+            document.body.setAttribute('data-palette', 'github-dark');
+            document.querySelectorAll('.palette-btn').forEach(b => {
+                if(b.dataset.palette === 'github-dark') b.classList.add('active');
+                else b.classList.remove('active');
+            });
+            if (audioBuffer) drawWaveform(audioBuffer);
         });
 
         function setupKnobs() {
@@ -1251,9 +1543,10 @@
                     const checked = e.detail.checked;
                     const id = slider.dataset.id;
                     if (id === 'theme-toggle') {
-                        const theme = checked ? 'light' : 'dark';
-                        document.body.setAttribute('data-theme', theme);
-                        if (audioBuffer) drawWaveform(audioBuffer);
+                        const paletteMenu = document.getElementById('palette-menu');
+                        if (paletteMenu) {
+                            paletteMenu.style.display = checked ? 'block' : 'none';
+                        }
                         return;
                     }
                     if (slider.classList.contains('group-toggle')) {
@@ -1326,7 +1619,7 @@
                 const onDrag = onDragStart(touch.clientY);
                 const onTouchMove = (moveEvent) => {
                     for (const t of moveEvent.changedTouches)
-                        if (t.identifier === touchId) onDrag(t.clientY);
+                        if (t.identifier === touchId) onDrag(t.clientX);
                 };
                 const onTouchEnd = (endEvent) => {
                     for (const t of endEvent.changedTouches) {
@@ -1396,6 +1689,13 @@
             autoplayBtn.textContent = 'Stop Autoplay';
             autoplayBtn.classList.add('playing');
             audioContext.resume();
+            
+            const inputGainKnob = document.querySelector('.knob-container[data-id="input-gain"]');
+            const baseGain = inputGainKnob ? parseFloat(inputGainKnob.dataset.value) : 1.0;
+            if (effects.inputGain) {
+                effects.inputGain.gain.setValueAtTime(baseGain, audioContext.currentTime);
+            }
+            
             granularNode.parameters.get('playing').setValueAtTime(1, audioContext.currentTime);
             autoplayState.startTime = performance.now();
             autoplayState.frameId = requestAnimationFrame(autoplayLoop);
@@ -1550,6 +1850,7 @@
             setupAudioChain();
             setupKnobs();
             setupSquareSliders();
+            setupPaletteMenu();
             setupCustomScrollbar();
             setupDraggablePanels();
             updateCropOverlays();
