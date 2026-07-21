@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>migrain</title>
-    <script src="https://unpkg.com/tunajs/tuna.js"></script>
     <style>
         :root {
             --light-bg: #ffffff;
@@ -344,8 +343,7 @@
         }
 
         button,
-        .file-upload-wrapper label,
-        a#github-btn {
+        .file-upload-wrapper label {
             background-color: transparent;
             color: var(--text);
             border: 1px solid var(--outline);
@@ -363,19 +361,12 @@
             text-decoration: none;
         }
 
-        #github-btn svg {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
-        }
-
         .file-upload-wrapper {
             display: flex;
         }
 
         button:hover,
-        .file-upload-wrapper label:hover,
-        a#github-btn:hover {
+        .file-upload-wrapper label:hover {
             background-color: var(--outline);
         }
 
@@ -393,6 +384,11 @@
         .autoplay-controls {
             grid-column: 1 / -1;
             display: contents;
+        }
+
+        .effect-group.disabled .effect-controls {
+            opacity: 0.5;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -524,207 +520,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="effect-group" data-effect="compressor">
-                    <div class="effect-header">
-                        <h2>Compressor</h2>
-                        <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
-                            <div class="square-slider-fill"></div>
-                        </div>
-                    </div>
-                    <div class="effect-controls" style="display:none">
-                        <div class="control">
-                            <label>Threshold</label>
-                            <div class="knob-container" data-id="comp-threshold" data-min="-100" data-max="0" data-value="-24"></div>
-                        </div>
-                        <div class="control">
-                            <label>Ratio</label>
-                            <div class="knob-container" data-id="comp-ratio" data-min="1" data-max="20" data-value="4"></div>
-                        </div>
-                        <div class="control">
-                            <label>Knee</label>
-                            <div class="knob-container" data-id="comp-knee" data-min="0" data-max="40" data-value="30"></div>
-                        </div>
-                        <div class="control">
-                            <label>Attack</label>
-                            <div class="knob-container" data-id="comp-attack" data-min="0" data-max="1" data-value="0.003" data-step="0.001"></div>
-                        </div>
-                        <div class="control">
-                            <label>Release</label>
-                            <div class="knob-container" data-id="comp-release" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Makeup</label>
-                            <div class="knob-container" data-id="comp-makeupGain" data-min="0" data-max="20" data-value="1"></div>
-                        </div>
-                        <div class="control">
-                            <label>Auto Makeup</label>
-                            <div class="square-slider-container" data-id="comp-automakeup" data-checked="false" data-default-checked="false">
-                                <div class="square-slider-fill"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="effect-group" data-effect="overdrive">
-                    <div class="effect-header">
-                        <h2>Overdrive</h2>
-                        <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
-                            <div class="square-slider-fill"></div>
-                        </div>
-                    </div>
-                    <div class="effect-controls" style="display:none">
-                        <div class="control">
-                            <label>Drive</label>
-                            <div class="knob-container" data-id="overdrive-drive" data-min="0" data-max="1" data-value="0.5" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Output</label>
-                            <div class="knob-container" data-id="overdrive-outputGain" data-min="0" data-max="1" data-value="0.5" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Curve</label>
-                            <div class="knob-container" data-id="overdrive-curveAmount" data-min="0" data-max="1" data-value="1" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Algorithm</label>
-                            <div class="knob-container" data-id="overdrive-algorithmIndex" data-min="0" data-max="5" data-value="0" data-step="1"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="effect-group" data-effect="chorus">
-                    <div class="effect-header">
-                        <h2>Chorus</h2>
-                        <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
-                            <div class="square-slider-fill"></div>
-                        </div>
-                    </div>
-                    <div class="effect-controls" style="display:none">
-                        <div class="control">
-                            <label>Rate</label>
-                            <div class="knob-container" data-id="chorus-rate" data-min="0.01" data-max="8" data-value="1.5" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Depth</label>
-                            <div class="knob-container" data-id="chorus-depth" data-min="0" data-max="1" data-value="0.7" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Feedback</label>
-                            <div class="knob-container" data-id="chorus-feedback" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Delay</label>
-                            <div class="knob-container" data-id="chorus-delay" data-min="0" data-max="0.1" data-value="0.0045" data-step="0.0001"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="effect-group" data-effect="phaser">
-                    <div class="effect-header">
-                        <h2>Phaser</h2>
-                        <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
-                            <div class="square-slider-fill"></div>
-                        </div>
-                    </div>
-                    <div class="effect-controls" style="display:none">
-                        <div class="control">
-                            <label>Rate</label>
-                            <div class="knob-container" data-id="phaser-rate" data-min="0.01" data-max="8" data-value="1.2" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Depth</label>
-                            <div class="knob-container" data-id="phaser-depth" data-min="0" data-max="1" data-value="0.3" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Feedback</label>
-                            <div class="knob-container" data-id="phaser-feedback" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Phase</label>
-                            <div class="knob-container" data-id="phaser-stereoPhase" data-min="0" data-max="180" data-value="30" data-step="1"></div>
-                        </div>
-                        <div class="control">
-                            <label>Base Freq</label>
-                            <div class="knob-container" data-id="phaser-baseModulationFrequency" data-min="500" data-max="1500" data-value="700" data-step="1"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="effect-group" data-effect="tremolo">
-                    <div class="effect-header">
-                        <h2>Tremolo</h2>
-                        <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
-                            <div class="square-slider-fill"></div>
-                        </div>
-                    </div>
-                    <div class="effect-controls" style="display:none">
-                        <div class="control">
-                            <label>Intensity</label>
-                            <div class="knob-container" data-id="tremolo-intensity" data-min="0" data-max="1" data-value="0.3" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Rate</label>
-                            <div class="knob-container" data-id="tremolo-rate" data-min="0.01" data-max="8" data-value="5" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Phase</label>
-                            <div class="knob-container" data-id="tremolo-stereoPhase" data-min="0" data-max="180" data-value="0" data-step="1"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="effect-group" data-effect="delay">
-                    <div class="effect-header">
-                        <h2>Delay</h2>
-                        <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
-                            <div class="square-slider-fill"></div>
-                        </div>
-                    </div>
-                    <div class="effect-controls" style="display:none">
-                        <div class="control">
-                            <label>Time</label>
-                            <div class="knob-container" data-id="delay-time" data-min="1" data-max="2000" data-value="350" step="1"></div>
-                        </div>
-                        <div class="control">
-                            <label>Feedback</label>
-                            <div class="knob-container" data-id="delay-feedback" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Cutoff</label>
-                            <div class="knob-container" data-id="delay-cutoff" data-min="20" data-max="20000" data-value="2000" step="1"></div>
-                        </div>
-                        <div class="control">
-                            <label>Mix</label>
-                            <div class="knob-container" data-id="delay-mix" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div>
-                        </div>
-                        <div class="control" style="grid-column:1 / -1;width:100%"><button id="stop-delay-btn">Stop Sound</button></div>
-                    </div>
-                </div>
-                <div class="effect-group" data-effect="reverb">
-                    <div class="effect-header">
-                        <h2>Reverb</h2>
-                        <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
-                            <div class="square-slider-fill"></div>
-                        </div>
-                    </div>
-                    <div class="effect-controls" style="display:none">
-                        <div class="control">
-                            <label>Dry</label>
-                            <div class="knob-container" data-id="reverb-dryLevel" data-min="0" data-max="1" data-value="1" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Wet</label>
-                            <div class="knob-container" data-id="reverb-wetLevel" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Level</label>
-                            <div class="knob-container" data-id="reverb-level" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
-                        </div>
-                        <div class="control">
-                            <label>Damping</label>
-                            <div class="knob-container" data-id="reverb-highCut" data-min="20" data-max="22050" data-value="22050" step="1"></div>
-                        </div>
-                        <div class="control">
-                            <label>Low Cut</label>
-                            <div class="knob-container" data-id="reverb-lowCut" data-min="20" data-max="22050" data-value="20" step="1"></div>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div id="custom-scrollbar">
                 <div id="scrollbar-thumb"></div>
@@ -739,23 +534,19 @@
                 </div>
                 <button id="record-btn">Record</button>
                 <button id="reset-btn">Reset All</button>
-                <a href="https://github.com/lan700ng" target="_blank" rel="noopener noreferrer" id="github-btn">
-                    <svg viewBox="0 0 16 16" version="1.1" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
-                    </svg>
-                </a>
+                <button id="info-btn">Info</button>
             </div>
         </div>
     </div>
     <script>
-        const audioContext = new(window.AudioContext || window.webkitAudioContext)();
-        const tuna = new Tuna(audioContext);
+        // Initialize Audio Context
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         let audioBuffer = null;
         let granularNode = null;
         let filterNode = null;
         let pannerNode = null;
         let isPlaying = false;
-        let activeCanvasTouchId = null;
+        
         const fileUpload = document.getElementById('audio-upload');
         const canvas = document.getElementById('waveform-canvas');
         const ctx = canvas.getContext('2d');
@@ -764,13 +555,18 @@
         const instructions = document.getElementById('instructions');
         const resetBtn = document.getElementById('reset-btn');
         const recordBtn = document.getElementById('record-btn');
+        const autoplayBtn = document.getElementById('autoplay-btn');
+        const cropOverlayStart = document.getElementById('crop-overlay-start');
+        const cropOverlayEnd = document.getElementById('crop-overlay-end');
+        
         let isRecording = false;
         let recorderNode = null;
         let recordedData = [];
         let effects = {};
+        
         let autoplayState = {
             isPlaying: false,
-            direction: false, // false for LTR, true for RTL
+            direction: false,
             cropStart: 0,
             cropEnd: 1,
             speed: 1,
@@ -778,9 +574,8 @@
             startTime: 0,
             frameId: null
         };
-        const autoplayBtn = document.getElementById('autoplay-btn');
-        const cropOverlayStart = document.getElementById('crop-overlay-start');
-        const cropOverlayEnd = document.getElementById('crop-overlay-end');
+
+        // Granular Processor Code
         const granularProcessorCode = `
             class GranularProcessor extends AudioWorkletProcessor {
                 constructor() {
@@ -915,7 +710,6 @@
                             noiseR = this._brownLastOut_R * 3.5;
                         }
 
-
                         for (const grain of this.grains) {
                             const progress = grain.playbackPosition / grain.totalDurationSamples;
                             if (progress >= 0 && progress < 1) {
@@ -975,971 +769,279 @@
             }
             registerProcessor('granular-processor', GranularProcessor);
         `;
+
+        // Setup Audio Chain
         async function setupAudioChain() {
             try {
-                const blob = new Blob([granularProcessorCode], {
-                    type: 'application/javascript'
-                });
+                const blob = new Blob([granularProcessorCode], { type: 'application/javascript' });
                 const workletURL = URL.createObjectURL(blob);
                 await audioContext.audioWorklet.addModule(workletURL);
+                
                 granularNode = new AudioWorkletNode(audioContext, 'granular-processor', {
                     outputChannelCount: [2]
                 });
+                
                 effects.inputGain = audioContext.createGain();
                 filterNode = audioContext.createBiquadFilter();
                 pannerNode = audioContext.createStereoPanner();
-                const effectConstructors = {
-                    compressor: () => new tuna.Compressor({
-                        bypass: true
-                    }),
-                    overdrive: () => new tuna.Overdrive({
-                        bypass: true
-                    }),
-                    chorus: () => new tuna.Chorus({
-                        bypass: true
-                    }),
-                    phaser: () => new tuna.Phaser({
-                        bypass: true
-                    }),
-                    tremolo: () => new tuna.Tremolo({
-                        bypass: true
-                    }),
-                    delay: () => new tuna.Delay({
-                        bypass: true
-                    }),
-                    reverb: () => new tuna.Convolver({
-                        impulse: "https://raw.githubusercontent.com/Theodeus/tuna/master/impulses/impulse_rev.wav",
-                        bypass: true
-                    })
-                };
-                const chain = [granularNode, effects.inputGain, filterNode, pannerNode];
-                document.querySelectorAll('.effect-group').forEach(group => {
-                    const effectName = group.dataset.effect;
-                    if (effectConstructors[effectName]) {
-                        const effect = effectConstructors[effectName]();
-                        effects[effectName] = effect;
-                        chain.push(effect);
-                    }
-                });
-                effects.masterGain = audioContext.createGain();
-                chain.push(effects.masterGain);
-                chain.push(audioContext.destination);
-                for (let i = 0; i < chain.length - 1; i++) {
-                    chain[i].connect(chain[i + 1]);
-                }
+                
+                effects.inputGain.connect(filterNode);
+                filterNode.connect(pannerNode);
+                pannerNode.connect(audioContext.destination);
+                granularNode.connect(effects.inputGain);
+                
+                instructions.textContent = 'Ready! Upload an audio file.';
             } catch (e) {
-                console.error("Error setting up audio chain:", e);
-                instructions.textContent = "Error: Browser not supported.";
+                console.error('Audio setup failed:', e);
+                instructions.textContent = 'Audio setup failed. Please refresh.';
             }
         }
-        fileUpload.addEventListener('change', async (event) => {
-            const file = event.target.files[0];
+
+        setupAudioChain();
+
+        // Load Audio File
+        fileUpload.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
             if (!file) return;
-            if (audioContext.state === 'suspended') audioContext.resume();
-            instructions.textContent = "Loading audio...";
+
             try {
                 const arrayBuffer = await file.arrayBuffer();
                 audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                
+                const channels = [];
+                for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
+                    channels.push(audioBuffer.getChannelData(i));
+                }
+                granularNode.port.postMessage({ buffers: channels });
+                
                 drawWaveform(audioBuffer);
-                if (granularNode) {
-                    const channels = [];
-                    for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
-                        channels.push(audioBuffer.getChannelData(i));
-                    }
-                    granularNode.port.postMessage({
-                        buffers: channels
-                    });
-                }
-                instructions.textContent = "Drag on the waveform to play. Drag up/down to filter.";
+                instructions.textContent = 'Loaded: ' + file.name;
             } catch (e) {
-                alert("Error decoding audio file.");
-                instructions.textContent = "Failed to load audio.";
+                console.error('Failed to load audio:', e);
+                instructions.textContent = 'Failed to load audio file.';
             }
         });
 
-        function handleInteraction(event, touchObject) {
-            if (!audioBuffer || !granularNode) return;
-            if (autoplayState.isPlaying) stopAutoplay();
-            const interactionSource = touchObject || event;
-            const rect = canvas.getBoundingClientRect();
-            const x = interactionSource.clientX - rect.left;
-            const y = interactionSource.clientY - rect.top;
-            const playheadPosition = Math.max(0, Math.min(1, x / rect.width));
-            granularNode.parameters.get('playhead').setValueAtTime(playheadPosition, audioContext.currentTime);
-            const normalizedY = 1 - Math.max(0, Math.min(1, y / rect.height));
-            const minFreq = 40;
-            const maxFreq = 20000;
-            const logFreq = minFreq * Math.pow(maxFreq / minFreq, normalizedY);
-            if (filterNode) filterNode.frequency.setTargetAtTime(logFreq, audioContext.currentTime, 0.01);
-            updatePlayIndicator(x, y);
-        }
-
-        function startPlayingMouse(e) {
-            if (e.target !== canvas || !audioBuffer) return;
-            if (autoplayState.isPlaying) stopAutoplay();
-            audioContext.resume();
-            isPlaying = true;
-            granularNode.parameters.get('playing').setValueAtTime(1, audioContext.currentTime);
-            handleInteraction(e, null);
-        }
-
-        function handleCanvasTouchStart(e) {
-            if (e.target !== canvas || !audioBuffer) return;
-            if (autoplayState.isPlaying) stopAutoplay();
-            e.preventDefault();
-            const soundControlTouch = e.changedTouches[0];
-            activeCanvasTouchId = soundControlTouch.identifier;
-            audioContext.resume();
-            isPlaying = true;
-            granularNode.parameters.get('playing').setValueAtTime(1, audioContext.currentTime);
-            handleInteraction(e, soundControlTouch);
-        }
-
-        function handleCanvasTouchMove(e) {
-            if (!isPlaying || activeCanvasTouchId === null) return;
-            e.preventDefault();
-            for (const touch of e.changedTouches) {
-                if (touch.identifier === activeCanvasTouchId) {
-                    handleInteraction(e, touch);
-                    break;
-                }
-            }
-        }
-
-        function handleCanvasTouchEnd(e) {
-            if (activeCanvasTouchId === null) return;
-            for (const touch of e.changedTouches) {
-                if (touch.identifier === activeCanvasTouchId) {
-                    activeCanvasTouchId = null;
-                    stopPlaying();
-                    break;
-                }
-            }
-        }
-
-        function stopPlaying() {
-            if (!isPlaying) return;
-            isPlaying = false;
-            granularNode.parameters.get('playing').setValueAtTime(0, audioContext.currentTime);
-            if (filterNode) filterNode.frequency.setTargetAtTime(20000, audioContext.currentTime, 0.01);
-            hidePlayIndicator();
-        }
-        canvas.addEventListener('mousedown', startPlayingMouse);
-        canvas.addEventListener('mousemove', (e) => isPlaying && activeCanvasTouchId === null && handleInteraction(e));
-        canvas.addEventListener('mouseup', stopPlaying);
-        canvas.addEventListener('mouseleave', stopPlaying);
-        canvas.addEventListener('touchstart', handleCanvasTouchStart, {
-            passive: false
-        });
-        canvas.addEventListener('touchmove', handleCanvasTouchMove, {
-            passive: false
-        });
-        canvas.addEventListener('touchend', handleCanvasTouchEnd);
-        const tunaMappings = {
-            'compThreshold': {
-                node: 'compressor',
-                param: 'threshold'
-            },
-            'compRatio': {
-                node: 'compressor',
-                param: 'ratio'
-            },
-            'compKnee': {
-                node: 'compressor',
-                param: 'knee'
-            },
-            'compAttack': {
-                node: 'compressor',
-                param: 'attack'
-            },
-            'compRelease': {
-                node: 'compressor',
-                param: 'release'
-            },
-            'compMakeupGain': {
-                node: 'compressor',
-                param: 'makeupGain'
-            },
-            'compAutomakeup': {
-                node: 'compressor',
-                param: 'automakeup',
-                type: 'bool'
-            },
-            'overdriveDrive': {
-                node: 'overdrive',
-                param: 'drive'
-            },
-            'overdriveOutputGain': {
-                node: 'overdrive',
-                param: 'outputGain'
-            },
-            'overdriveCurveAmount': {
-                node: 'overdrive',
-                param: 'curveAmount'
-            },
-            'overdriveAlgorithmIndex': {
-                node: 'overdrive',
-                param: 'algorithmIndex'
-            },
-            'chorusRate': {
-                node: 'chorus',
-                param: 'rate'
-            },
-            'chorusDepth': {
-                node: 'chorus',
-                param: 'depth'
-            },
-            'chorusFeedback': {
-                node: 'chorus',
-                param: 'feedback'
-            },
-            'chorusDelay': {
-                node: 'chorus',
-                param: 'delay'
-            },
-            'phaserRate': {
-                node: 'phaser',
-                param: 'rate'
-            },
-            'phaserDepth': {
-                node: 'phaser',
-                param: 'depth'
-            },
-            'phaserFeedback': {
-                node: 'phaser',
-                param: 'feedback'
-            },
-            'phaserStereoPhase': {
-                node: 'phaser',
-                param: 'stereoPhase'
-            },
-            'phaserBaseModulationFrequency': {
-                node: 'phaser',
-                param: 'baseModulationFrequency'
-            },
-            'tremoloIntensity': {
-                node: 'tremolo',
-                param: 'intensity'
-            },
-            'tremoloRate': {
-                node: 'tremolo',
-                param: 'rate'
-            },
-            'tremoloStereoPhase': {
-                node: 'tremolo',
-                param: 'stereoPhase'
-            },
-            'delayTime': {
-                node: 'delay',
-                param: 'delayTime'
-            },
-            'delayFeedback': {
-                node: 'delay',
-                param: 'feedback'
-            },
-            'delayCutoff': {
-                node: 'delay',
-                param: 'cutoff'
-            },
-            'delayMix': {
-                node: 'delay',
-                param: 'wetLevel'
-            },
-            'reverbWetLevel': {
-                node: 'reverb',
-                param: 'wetLevel'
-            },
-            'reverbDryLevel': {
-                node: 'reverb',
-                param: 'dryLevel'
-            },
-            'reverbLevel': {
-                node: 'reverb',
-                param: 'level'
-            },
-            'reverbHighCut': {
-                node: 'reverb',
-                param: 'highCut'
-            },
-            'reverbLowCut': {
-                node: 'reverb',
-                param: 'lowCut'
-            }
-        };
-
-        function updateAudioParameter(id, value) {
-            if (!granularNode) return;
-            const paramName = id.replace(/-./g, x => x[1].toUpperCase());
-            if (paramName === 'inputGain') {
-                effects.inputGain.gain.setTargetAtTime(value, audioContext.currentTime, 0.01);
-            } else if (paramName === 'previewFilterType') {
-                const types = ['lowpass', 'highpass', 'bandpass', 'lowshelf', 'highshelf', 'peaking', 'notch', 'allpass'];
-                if (filterNode) filterNode.type = types[Math.round(value)];
-            } else if (paramName === 'previewFilterQ') {
-                if (filterNode) filterNode.Q.setTargetAtTime(value, audioContext.currentTime, 0.01);
-            } else if (paramName === 'autoplayCropStart') {
-                autoplayState.cropStart = value;
-                updateCropOverlays();
-            } else if (paramName === 'autoplayCropEnd') {
-                autoplayState.cropEnd = value;
-                updateCropOverlays();
-            } else if (paramName === 'autoplaySpeed') {
-                autoplayState.speed = value;
-            } else if (paramName === 'autoplayVerticalPos') {
-                autoplayState.verticalPos = value;
-            } else if (paramName === 'autoplayDirection') {
-                autoplayState.direction = value;
-            } else if (granularNode.parameters.has(paramName)) {
-                granularNode.parameters.get(paramName).setTargetAtTime(value, audioContext.currentTime, 0.01);
-            } else if (paramName === 'pan' && pannerNode) {
-                pannerNode.pan.setTargetAtTime(value, audioContext.currentTime, 0.01);
-            } else {
-                const mapping = tunaMappings[paramName];
-                if (mapping && effects[mapping.node]) {
-                    effects[mapping.node][mapping.param] = value;
-                }
-            }
-        }
-        document.getElementById('stop-delay-btn').addEventListener('click', () => {
-            const feedbackKnob = document.querySelector('.knob-container[data-id="delay-feedback"]');
-            const mixKnob = document.querySelector('.knob-container[data-id="delay-mix"]');
-            if (feedbackKnob && feedbackKnob.setValue) {
-                feedbackKnob.setValue(0);
-            }
-            if (mixKnob && mixKnob.setValue) {
-                mixKnob.setValue(0);
-            }
-        });
-        recordBtn.addEventListener('click', toggleRecording);
-
+        // Draw Waveform
         function drawWaveform(buffer) {
+            const width = canvas.width;
+            const height = canvas.height;
+            ctx.fillStyle = getComputedStyle(canvas).backgroundColor;
+            ctx.fillRect(0, 0, width, height);
+
             const data = buffer.getChannelData(0);
-            const step = Math.ceil(data.length / canvas.width);
-            const amp = canvas.height / 2;
-            const theme = document.body.getAttribute('data-theme');
-            const waveColor = theme === 'light' ? '#1a73e8' : '#8ab4f8';
-            const bgColor = theme === 'light' ? '#ffffff' : '#202124';
-            ctx.fillStyle = bgColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = waveColor;
+            const step = Math.ceil(data.length / width);
+            const amp = height / 2;
+
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
             ctx.beginPath();
-            for (let i = 0; i < canvas.width; i++) {
-                let min = 1.0,
-                    max = -1.0;
+
+            for (let i = 0; i < width; i++) {
+                let min = 1.0;
+                let max = -1.0;
                 for (let j = 0; j < step; j++) {
-                    const datum = data[(i * step) + j];
+                    const datum = data[i * step + j];
                     if (datum < min) min = datum;
                     if (datum > max) max = datum;
                 }
-                ctx.moveTo(i, (1 + min) * amp);
-                ctx.lineTo(i, (1 + max) * amp);
+                ctx.lineTo(i, amp - max * amp);
             }
             ctx.stroke();
         }
 
-        function updatePlayIndicator(x, y) {
-            playIndicatorV.style.opacity = '1';
-            playIndicatorH.style.opacity = '1';
-            playIndicatorV.style.transform = `translateX(${Math.round(x)}px)`;
-            playIndicatorH.style.top = `${Math.round(y)}px`;
+        // Knob Rendering
+        function renderKnob(container) {
+            const min = parseFloat(container.dataset.min);
+            const max = parseFloat(container.dataset.max);
+            const value = parseFloat(container.dataset.value);
+            
+            const normalizedValue = (value - min) / (max - min);
+            const startAngle = Math.PI * 0.75;
+            const endAngle = Math.PI * 2.25;
+            const angle = startAngle + (endAngle - startAngle) * normalizedValue;
+
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 100 100');
+
+            const track = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            track.setAttribute('cx', '50');
+            track.setAttribute('cy', '50');
+            track.setAttribute('r', '40');
+            track.classList.add('knob-track');
+
+            const fill = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            fill.setAttribute('cx', '50');
+            fill.setAttribute('cy', '50');
+            fill.setAttribute('r', '40');
+            fill.classList.add('knob-fill');
+            fill.setAttribute('stroke-dasharray', `${(endAngle - startAngle) * 40} ${Math.PI * 80}`);
+            fill.setAttribute('stroke-dashoffset', `${(1 - normalizedValue) * (endAngle - startAngle) * 40}`);
+
+            svg.appendChild(track);
+            svg.appendChild(fill);
+            container.innerHTML = '';
+            container.appendChild(svg);
         }
 
-        function hidePlayIndicator() {
-            playIndicatorV.style.opacity = '0';
-            playIndicatorH.style.opacity = '0';
+        // Initialize all knobs and controls
+        document.querySelectorAll('.knob-container').forEach(container => {
+            renderKnob(container);
+            container.addEventListener('pointerdown', handleKnobDrag);
+        });
+
+        // Knob Drag Handler
+        function handleKnobDrag(e) {
+            const container = e.currentTarget;
+            const min = parseFloat(container.dataset.min);
+            const max = parseFloat(container.dataset.max);
+            const step = parseFloat(container.dataset.step) || (max - min) / 100;
+            let currentValue = parseFloat(container.dataset.value);
+
+            function onMove(moveEvent) {
+                const deltaX = moveEvent.clientX - e.clientX;
+                currentValue = Math.max(min, Math.min(max, currentValue + (deltaX / 100) * step));
+                container.dataset.value = currentValue;
+                renderKnob(container);
+                
+                updateAudioParameter(container.dataset.id, currentValue);
+            }
+
+            function onEnd() {
+                document.removeEventListener('pointermove', onMove);
+                document.removeEventListener('pointerup', onEnd);
+            }
+
+            document.addEventListener('pointermove', onMove);
+            document.addEventListener('pointerup', onEnd);
+            e.preventDefault();
         }
 
-        function toggleRecording() {
-            if (isRecording) {
-                isRecording = false;
-                effects.masterGain.disconnect(recorderNode);
-                recorderNode.disconnect(audioContext.destination);
-                recorderNode = null;
-                recordBtn.textContent = 'Record';
-                recordBtn.classList.remove('recording');
-                exportWAV(recordedData);
-                recordedData = [];
-            } else {
-                if (!audioBuffer) {
-                    alert("Please upload an audio file first.");
-                    return;
-                }
-                recorderNode = audioContext.createScriptProcessor(4096, 2, 2);
-                recorderNode.onaudioprocess = (e) => {
-                    if (!isRecording) return;
-                    const inputBuffer = e.inputBuffer;
-                    for (let i = 0; i < inputBuffer.numberOfChannels; i++) {
-                        if (!recordedData[i]) recordedData[i] = [];
-                        recordedData[i].push(new Float32Array(inputBuffer.getChannelData(i)));
-                    }
-                };
-                effects.masterGain.connect(recorderNode);
-                recorderNode.connect(audioContext.destination);
-                isRecording = true;
-                recordBtn.textContent = 'Stop';
-                recordBtn.classList.add('recording');
-            }
-        }
+        // Update Audio Parameters
+        function updateAudioParameter(id, value) {
+            if (!granularNode) return;
 
-        function exportWAV(recordedData) {
-            const numberOfChannels = recordedData.length;
-            if (numberOfChannels === 0) return;
-            const sampleRate = audioContext.sampleRate;
-            const channelSamples = recordedData.map(channelBuffers => {
-                const totalLength = channelBuffers.reduce((len, buf) => len + buf.length, 0);
-                const combined = new Float32Array(totalLength);
-                let offset = 0;
-                for (const buffer of channelBuffers) {
-                    combined.set(buffer, offset);
-                    offset += buffer.length;
-                }
-                return combined;
-            });
-            const totalSampleCount = channelSamples[0].length;
-            const interleaved = new Float32Array(totalSampleCount * numberOfChannels);
-            let offset = 0;
-            for (let i = 0; i < totalSampleCount; i++) {
-                for (let j = 0; j < numberOfChannels; j++) {
-                    interleaved[offset++] = channelSamples[j][i];
-                }
-            }
-            const pcmData = new Int16Array(interleaved.length);
-            for (let i = 0; i < interleaved.length; i++) {
-                let s = Math.max(-1, Math.min(1, interleaved[i]));
-                pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-            }
-            const buffer = new ArrayBuffer(44 + pcmData.length * 2);
-            const view = new DataView(buffer);
-            const writeString = (view, offset, string) => {
-                for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+            const paramMapping = {
+                'input-gain': { param: 'none', fn: () => effects.inputGain.gain.value = value },
+                'preview-filter-type': { param: 'none', fn: () => filterNode.type = ['lowpass', 'highpass', 'bandpass', 'lowshelf', 'highshelf', 'peaking', 'notch', 'allpass'][Math.floor(value)] },
+                'preview-filter-q': { param: 'none', fn: () => filterNode.Q.value = value },
+                'grain-size': { param: 'grainSize' },
+                'grain-density': { param: 'grainDensity' },
+                'pitch': { param: 'pitch' },
+                'pitch-jitter': { param: 'pitchJitter' },
+                'grain-jitter': { param: 'grainJitter' },
+                'spread': { param: 'spread' },
+                'pan': { param: 'none', fn: () => pannerNode.pan.value = value },
+                'reverse-chance': { param: 'reverseChance' },
+                'noise-amount': { param: 'noiseAmount' },
+                'noise-type': { param: 'noiseType' },
+                'pitch-sync': { param: 'pitchSync' }
             };
-            writeString(view, 0, 'RIFF');
-            view.setUint32(4, 36 + pcmData.length * 2, true);
-            writeString(view, 8, 'WAVE');
-            writeString(view, 12, 'fmt ');
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true);
-            view.setUint16(22, numberOfChannels, true);
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * numberOfChannels * 2, true);
-            view.setUint16(32, numberOfChannels * 2, true);
-            view.setUint16(34, 16, true);
-            writeString(view, 36, 'data');
-            view.setUint32(40, pcmData.length * 2, true);
-            for (let i = 0; i < pcmData.length; i++) view.setInt16(44 + i * 2, pcmData[i], true);
-            const blob = new Blob([view], {
-                type: 'audio/wav'
-            });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = 'granular_recording.wav';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+
+            const mapping = paramMapping[id];
+            if (mapping) {
+                if (mapping.param && granularNode.parameters.has(mapping.param)) {
+                    granularNode.parameters.get(mapping.param).value = value;
+                }
+                if (mapping.fn) mapping.fn();
+            }
         }
-        resetBtn.addEventListener('click', () => {
-            document.querySelectorAll('.knob-container').forEach(knob => {
-                const defaultValue = parseFloat(knob.dataset.defaultValue);
-                knob.setValue(defaultValue);
-            });
-            document.querySelectorAll('.square-slider-container').forEach(slider => {
-                const defaultChecked = slider.dataset.defaultChecked === 'true';
-                if (slider.updateState) {
-                    slider.updateState(defaultChecked);
+
+        // Square Slider Handler
+        document.querySelectorAll('.square-slider-container').forEach(slider => {
+            slider.addEventListener('click', (e) => {
+                const checked = slider.dataset.checked === 'true';
+                slider.dataset.checked = !checked;
+                
+                if (slider.dataset.id === 'theme-toggle') {
+                    const theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+                    document.body.dataset.theme = theme;
+                }
+                
+                const groupToggle = slider.closest('.effect-group');
+                if (groupToggle && slider.classList.contains('group-toggle')) {
+                    const controls = groupToggle.querySelector('.effect-controls');
+                    controls.style.display = checked ? 'none' : 'grid';
                 }
             });
         });
 
-        function setupKnobs() {
-            document.querySelectorAll('.knob-container').forEach(container => {
-                const min = parseFloat(container.dataset.min);
-                const max = parseFloat(container.dataset.max);
-                let value = parseFloat(container.dataset.value);
-                container.dataset.defaultValue = value;
-                const id = container.dataset.id;
-                const svgNS = "http://www.w3.org/2000/svg";
-                const svg = document.createElementNS(svgNS, "svg");
-                svg.setAttribute("viewBox", "0 0 100 100");
-                const track = document.createElementNS(svgNS, "circle");
-                track.setAttribute("class", "knob-track");
-                track.setAttribute("cx", "50");
-                track.setAttribute("cy", "50");
-                track.setAttribute("r", "40");
-                const fill = document.createElementNS(svgNS, "circle");
-                fill.setAttribute("class", "knob-fill");
-                fill.setAttribute("cx", "50");
-                fill.setAttribute("cy", "50");
-                fill.setAttribute("r", "40");
-                const circumference = 2 * Math.PI * 40;
-                const totalAngle = 270;
-                const arcLength = (circumference * totalAngle) / 360;
-                track.setAttribute("stroke-dasharray", `${arcLength} ${circumference - arcLength}`);
-                fill.setAttribute("stroke-dashoffset", circumference);
-                svg.appendChild(track);
-                svg.appendChild(fill);
-                container.appendChild(svg);
-                const updateFill = (val) => {
-                    const percentage = (val - min) / (max - min);
-                    const fillLength = arcLength * percentage;
-                    fill.setAttribute("stroke-dasharray", `${fillLength} ${circumference - fillLength}`);
-                };
-                container.setValue = (newValue) => {
-                    value = Math.max(min, Math.min(max, newValue));
-                    container.dataset.value = value;
-                    updateFill(value);
-                    updateAudioParameter(id, value);
-                };
-                const onDragStart = (startX) => {
-                    const valueOnStart = value;
-                    const onDrag = (currentX) => {
-                        const deltaX = currentX - startX;
-                        const range = max - min;
-                        const newValue = valueOnStart + (deltaX * range / 200);
-                        container.setValue(newValue);
-                    };
-                    return onDrag;
-                };
-                container.addEventListener('mousedown', e => {
-                    const onDrag = onDragStart(e.clientX);
-                    const onMouseMove = (moveEvent) => onDrag(moveEvent.clientX);
-                    const onMouseUp = () => {
-                        document.removeEventListener('mousemove', onMouseMove);
-                        document.removeEventListener('mouseup', onMouseUp);
-                    };
-                    document.addEventListener('mousemove', onMouseMove);
-                    document.addEventListener('mouseup', onMouseUp);
-                });
-                container.addEventListener('touchstart', e => {
-                    const touch = e.changedTouches[0];
-                    const touchId = touch.identifier;
-                    const onDrag = onDragStart(touch.clientX);
-                    const onTouchMove = (moveEvent) => {
-                        for (const t of moveEvent.changedTouches)
-                            if (t.identifier === touchId) onDrag(t.clientX);
-                    };
-                    const onTouchEnd = (endEvent) => {
-                        for (const t of endEvent.changedTouches) {
-                            if (t.identifier === touchId) {
-                                document.removeEventListener('touchmove', onTouchMove);
-                                document.removeEventListener('touchend', onTouchEnd);
-                            }
-                        }
-                    };
-                    document.addEventListener('touchmove', onTouchMove, {
-                        passive: false
-                    });
-                    document.addEventListener('touchend', onTouchEnd);
-                }, {
-                    passive: false
-                });
-                container.addEventListener('dblclick', () => {
-                    container.setValue(parseFloat(container.dataset.defaultValue));
-                });
-                container.setValue(value);
-            });
-        }
-
-        function setupSquareSliders() {
-            document.querySelectorAll('.square-slider-container').forEach(slider => {
-                const fill = slider.querySelector('.square-slider-fill');
-                let didDrag = false;
-                slider.updateState = (checked, applyTransition = true) => {
-                    slider.dataset.checked = checked;
-                    fill.style.transition = applyTransition ? 'transform 0.2s' : 'none';
-                    fill.style.transform = `scaleX(${checked ? 1 : 0})`;
-                    slider.dispatchEvent(new CustomEvent('statechange', {
-                        detail: {
-                            checked
-                        }
-                    }));
-                };
-                const onDragStart = (startX) => {
-                    const startChecked = slider.dataset.checked === 'true';
-                    const onDrag = (currentX) => {
-                        didDrag = true;
-                        const deltaX = currentX - startX;
-                        const width = slider.offsetWidth;
-                        let fillPercent = (startChecked ? width + deltaX : deltaX) / width;
-                        fillPercent = Math.max(0, Math.min(1, fillPercent));
-                        fill.style.transition = 'none';
-                        fill.style.transform = `scaleX(${fillPercent})`;
-                    };
-                    const onDragEnd = (currentX) => {
-                        const deltaX = currentX - startX;
-                        if (Math.abs(deltaX) > 2) {
-                            slider.updateState(deltaX > 0);
-                        }
-                    };
-                    return {
-                        onDrag,
-                        onDragEnd
-                    };
-                };
-                slider.addEventListener('mousedown', e => {
-                    didDrag = false;
-                    const {
-                        onDrag,
-                        onDragEnd
-                    } = onDragStart(e.clientX);
-                    const onMouseMove = (moveEvent) => onDrag(moveEvent.clientX);
-                    const onMouseUp = (upEvent) => {
-                        document.removeEventListener('mousemove', onMouseMove);
-                        document.removeEventListener('mouseup', onMouseUp);
-                        onDragEnd(upEvent.clientX);
-                    };
-                    document.addEventListener('mousemove', onMouseMove);
-                    document.addEventListener('mouseup', onMouseUp);
-                });
-                slider.addEventListener('touchstart', e => {
-                    didDrag = false;
-                    const touch = e.changedTouches[0];
-                    const touchId = touch.identifier;
-                    const {
-                        onDrag,
-                        onDragEnd
-                    } = onDragStart(touch.clientX);
-                    const onTouchMove = (moveEvent) => {
-                        for (const t of moveEvent.changedTouches)
-                            if (t.identifier === touchId) onDrag(t.clientX);
-                    };
-                    const onTouchEnd = (endEvent) => {
-                        for (const t of endEvent.changedTouches) {
-                            if (t.identifier === touchId) {
-                                document.removeEventListener('touchmove', onTouchMove);
-                                document.removeEventListener('touchend', onTouchEnd);
-                                onDragEnd(t.clientX);
-                            }
-                        }
-                    };
-                    document.addEventListener('touchmove', onTouchMove, {
-                        passive: false
-                    });
-                    document.addEventListener('touchend', onTouchEnd);
-                }, {
-                    passive: false
-                });
-                slider.addEventListener('click', (e) => {
-                    if (!didDrag) {
-                        slider.updateState(slider.dataset.checked !== 'true');
-                    }
-                });
-                slider.addEventListener('statechange', (e) => {
-                    const checked = e.detail.checked;
-                    const id = slider.dataset.id;
-                    if (id === 'theme-toggle') {
-                        const theme = checked ? 'light' : 'dark';
-                        document.body.setAttribute('data-theme', theme);
-                        if (audioBuffer) drawWaveform(audioBuffer);
-                        return;
-                    }
-                    if (slider.classList.contains('group-toggle')) {
-                        const group = slider.closest('.effect-group');
-                        const effectName = group.dataset.effect;
-                        const controls = group.querySelector('.effect-controls');
-                        if (controls) controls.style.display = checked ? 'grid' : 'none';
-                        if (effectName !== 'input' && effects[effectName]) {
-                            effects[effectName].bypass = !checked;
-                        }
-                        return;
-                    }
-                    const paramName = id.replace(/-./g, x => x[1].toUpperCase());
-                    if (paramName === 'pitchSync') {
-                        if (granularNode) granularNode.parameters.get('pitchSync').setValueAtTime(checked ? 1 : 0, audioContext.currentTime);
-                        return;
-                    }
-                    if (paramName === 'autoplayDirection') {
-                        updateAudioParameter(id, checked);
-                        return;
-                    }
-                    const mapping = tunaMappings[paramName];
-                    if (mapping && effects[mapping.node]) effects[mapping.node][mapping.param] = checked;
-                });
-                slider.updateState(slider.dataset.checked === 'true', false);
-            });
-        }
-
-        function setupCustomScrollbar() {
-            const container = document.querySelector('.container');
-            const scrollbar = document.getElementById('custom-scrollbar');
-            const thumb = document.getElementById('scrollbar-thumb');
-            const updateThumb = () => {
-                const scrollableHeight = container.scrollHeight - container.clientHeight;
-                if (scrollableHeight <= 0) {
-                    scrollbar.style.display = 'none';
-                    return;
-                }
-                scrollbar.style.display = 'block';
-                const trackHeight = scrollbar.clientHeight;
-                const thumbHeight = Math.max(20, (container.clientHeight / container.scrollHeight) * trackHeight);
-                thumb.style.height = `${thumbHeight}px`;
-                const scrollPercentage = container.scrollTop / scrollableHeight;
-                const thumbTop = scrollPercentage * (trackHeight - thumbHeight);
-                thumb.style.top = `${thumbTop}px`;
-            };
-            container.addEventListener('scroll', updateThumb);
-            new ResizeObserver(updateThumb).observe(container);
-            const onDragStart = (startY) => {
-                const initialScrollTop = container.scrollTop;
-                const trackHeight = scrollbar.clientHeight;
-                const thumbHeight = thumb.offsetHeight;
-                const onDrag = (currentY) => {
-                    const deltaY = currentY - startY;
-                    const scrollableHeight = container.scrollHeight - container.clientHeight;
-                    const scrollDelta = (deltaY / (trackHeight - thumbHeight)) * scrollableHeight;
-                    container.scrollTop = initialScrollTop + scrollDelta;
-                };
-                return onDrag;
-            };
-            thumb.addEventListener('mousedown', e => {
-                e.stopPropagation();
-                const onDrag = onDragStart(e.clientY);
-                const onMouseMove = (moveEvent) => onDrag(moveEvent.clientY);
-                const onMouseUp = () => {
-                    document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onMouseUp);
-                };
-                document.addEventListener('mousemove', onMouseMove);
-                document.addEventListener('mouseup', onMouseUp);
-            });
-            thumb.addEventListener('touchstart', e => {
-                e.stopPropagation();
-                const touch = e.changedTouches[0];
-                const touchId = touch.identifier;
-                const onDrag = onDragStart(touch.clientY);
-                const onTouchMove = (moveEvent) => {
-                    for (const t of moveEvent.changedTouches)
-                        if (t.identifier === touchId) onDrag(t.clientY);
-                };
-                const onTouchEnd = (endEvent) => {
-                    for (const t of endEvent.changedTouches) {
-                        if (t.identifier === touchId) {
-                            document.removeEventListener('touchmove', onTouchMove);
-                            document.removeEventListener('touchend', onTouchEnd);
-                        }
-                    }
-                };
-                document.addEventListener('touchmove', onTouchMove, {
-                    passive: false
-                });
-                document.addEventListener('touchend', onTouchEnd);
-            }, {
-                passive: false
-            });
-        }
-
-        function updateCropOverlays() {
-            if (autoplayState.cropStart >= autoplayState.cropEnd) {
-                const startKnob = document.querySelector('.knob-container[data-id="autoplay-crop-start"]');
-                const endKnob = document.querySelector('.knob-container[data-id="autoplay-crop-end"]');
-                if (startKnob && endKnob) {
-                    const temp = autoplayState.cropStart;
-                    startKnob.setValue(autoplayState.cropEnd);
-                    endKnob.setValue(temp);
-                }
-            }
-            cropOverlayStart.style.width = `${autoplayState.cropStart * 100}%`;
-            cropOverlayEnd.style.width = `${(1 - autoplayState.cropEnd) * 100}%`;
-        }
-
-        function autoplayLoop(timestamp) {
-            if (!autoplayState.isPlaying || !audioBuffer) return;
-            const elapsedTime = (timestamp - autoplayState.startTime) / 1000;
-            const cropRange = autoplayState.cropEnd - autoplayState.cropStart;
-            if (cropRange <= 0) {
-                autoplayState.frameId = requestAnimationFrame(autoplayLoop);
-                return;
-            }
-            const loopDuration = (audioBuffer.duration * cropRange) / autoplayState.speed;
-            let progressInLoop = (elapsedTime % loopDuration) / loopDuration;
-            if (autoplayState.direction) { // RTL
-                progressInLoop = 1 - progressInLoop;
-            }
-            const playheadPosition = autoplayState.cropStart + (progressInLoop * cropRange);
-            granularNode.parameters.get('playhead').setTargetAtTime(playheadPosition, audioContext.currentTime, 0.01);
-            const rect = canvas.getBoundingClientRect();
-            const x = playheadPosition * rect.width;
-            const y = (1 - autoplayState.verticalPos) * rect.height;
-            const normalizedY = autoplayState.verticalPos;
-            const minFreq = 40;
-            const maxFreq = 20000;
-            const logFreq = minFreq * Math.pow(maxFreq / minFreq, normalizedY);
-            if (filterNode) filterNode.frequency.setTargetAtTime(logFreq, audioContext.currentTime, 0.01);
-            updatePlayIndicator(x, y);
-            autoplayState.frameId = requestAnimationFrame(autoplayLoop);
-        }
-
-        function startAutoplay() {
-            if (!audioBuffer) {
-                alert("Please upload an audio file first.");
-                return;
-            }
-            if (isPlaying) stopPlaying();
-            autoplayState.isPlaying = true;
-            autoplayBtn.textContent = 'Stop Autoplay';
-            autoplayBtn.classList.add('playing');
-            audioContext.resume();
-            granularNode.parameters.get('playing').setValueAtTime(1, audioContext.currentTime);
-            autoplayState.startTime = performance.now();
-            autoplayState.frameId = requestAnimationFrame(autoplayLoop);
-        }
-
-        function stopAutoplay() {
-            if (!autoplayState.isPlaying) return;
-            autoplayState.isPlaying = false;
-            autoplayBtn.textContent = 'Autoplay';
-            autoplayBtn.classList.remove('playing');
-            if (autoplayState.frameId) {
-                cancelAnimationFrame(autoplayState.frameId);
-                autoplayState.frameId = null;
-            }
-            granularNode.parameters.get('playing').setValueAtTime(0, audioContext.currentTime);
-            hidePlayIndicator();
-        }
+        // Play/Stop Controls
+        let currentSource = null;
         autoplayBtn.addEventListener('click', () => {
             if (autoplayState.isPlaying) {
                 stopAutoplay();
-            } else {
+            } else if (audioBuffer) {
                 startAutoplay();
             }
         });
 
-        function saveLayout() {
-            const sections = document.querySelectorAll('.draggable-section');
-            const order = Array.from(sections).map(section => section.id);
-            localStorage.setItem('migrainPanelOrder', JSON.stringify(order));
+        function startAutoplay() {
+            if (!audioBuffer || !granularNode) return;
+            
+            autoplayState.isPlaying = true;
+            autoplayBtn.classList.add('playing');
+            
+            if (currentSource) currentSource.stop();
+            currentSource = audioContext.createBufferSource();
+            currentSource.buffer = audioBuffer;
+            currentSource.connect(effects.inputGain);
+            
+            const cropStart = autoplayState.cropStart * audioBuffer.duration;
+            const cropEnd = autoplayState.cropEnd * audioBuffer.duration;
+            currentSource.start(audioContext.currentTime, cropStart, cropEnd - cropStart);
         }
 
-        function loadLayout() {
-            const order = JSON.parse(localStorage.getItem('migrainPanelOrder'));
-            const container = document.getElementById('main-content');
-            if (order && order.length) {
-                order.forEach(id => {
-                    const section = document.getElementById(id);
-                    if (section) {
-                        container.appendChild(section);
-                    }
-                });
+        function stopAutoplay() {
+            autoplayState.isPlaying = false;
+            autoplayBtn.classList.remove('playing');
+            if (currentSource) {
+                currentSource.stop();
+                currentSource = null;
             }
         }
 
-        function setupDraggablePanels() {
-            const container = document.getElementById('main-content');
-            let draggedElement = null;
-            let placeholder = null;
-            let startY = 0;
-            let initialTop = 0;
-
-            const onDragStart = (e) => {
-                const handle = e.target.closest('.drag-handle');
-                if (!handle) return;
-
-                draggedElement = handle.closest('.draggable-section');
-                if (!draggedElement) return;
-
-                e.preventDefault();
-
-                const allSections = document.querySelectorAll('.draggable-section');
-                allSections.forEach(section => {
-                    const rect = section.getBoundingClientRect();
-                    section.style.height = `${rect.height}px`;
-                });
-
-                const rect = draggedElement.getBoundingClientRect();
-                startY = e.touches ? e.touches[0].clientY : e.clientY;
-                initialTop = draggedElement.offsetTop;
-
-                placeholder = document.createElement('div');
-                placeholder.className = 'placeholder';
-                placeholder.style.height = `${rect.height}px`;
-                placeholder.style.margin = getComputedStyle(draggedElement).margin;
-
-                draggedElement.parentNode.insertBefore(placeholder, draggedElement);
-                draggedElement.classList.add('is-dragging');
-                draggedElement.style.position = 'absolute';
-                draggedElement.style.top = `${initialTop}px`;
-                draggedElement.style.width = `${rect.width}px`;
-
-                document.addEventListener('mousemove', onDragMove);
-                document.addEventListener('touchmove', onDragMove, {
-                    passive: false
-                });
-                document.addEventListener('mouseup', onDragEnd);
-                document.addEventListener('touchend', onDragEnd);
-            };
-
-            const onDragMove = (e) => {
-                if (!draggedElement) return;
-                e.preventDefault();
-
-                const currentY = e.touches ? e.touches[0].clientY : e.clientY;
-                const deltaY = currentY - startY;
-                draggedElement.style.top = `${initialTop + deltaY}px`;
-
-                const draggedRect = draggedElement.getBoundingClientRect();
-                const siblings = [...container.querySelectorAll('.draggable-section:not(.is-dragging)')];
-
-                siblings.forEach(sibling => {
-                    const rect = sibling.getBoundingClientRect();
-                    if (draggedRect.top < rect.top + rect.height / 2 && sibling.offsetTop < placeholder.offsetTop) {
-                        container.insertBefore(placeholder, sibling);
-                    } else if (draggedRect.bottom > rect.top + rect.height / 2 && sibling.offsetTop > placeholder.offsetTop) {
-                        container.insertBefore(placeholder, sibling.nextSibling);
+        // Reset Button
+        resetBtn.addEventListener('click', () => {
+            document.querySelectorAll('[data-id]').forEach(el => {
+                if (el.dataset.defaultChecked !== undefined) {
+                    el.dataset.checked = el.dataset.defaultChecked;
+                } else if (el.dataset.value !== undefined) {
+                    el.dataset.value = parseFloat(el.dataset.value);
+                    if (el.classList.contains('knob-container')) {
+                        renderKnob(el);
+                        updateAudioParameter(el.dataset.id, parseFloat(el.dataset.value));
                     }
-                });
-            };
-
-            const onDragEnd = () => {
-                if (!draggedElement) return;
-
-                placeholder.parentNode.insertBefore(draggedElement, placeholder);
-
-                draggedElement.classList.remove('is-dragging');
-                draggedElement.style.position = '';
-                draggedElement.style.top = '';
-                draggedElement.style.width = '';
-
-                placeholder.remove();
-                draggedElement = null;
-                placeholder = null;
-
-                const allSections = document.querySelectorAll('.draggable-section');
-                allSections.forEach(section => {
-                    section.style.height = '';
-                });
-
-                document.removeEventListener('mousemove', onDragMove);
-                document.removeEventListener('touchmove', onDragMove);
-                document.removeEventListener('mouseup', onDragEnd);
-                document.removeEventListener('touchend', onDragEnd);
-
-                saveLayout();
-            };
-
-            container.addEventListener('mousedown', onDragStart);
-            container.addEventListener('touchstart', onDragStart, {
-                passive: false
+                }
             });
-        }
+        });
 
+        // Record Button
+        recordBtn.addEventListener('click', async () => {
+            if (!isRecording && audioContext.state === 'running') {
+                isRecording = true;
+                recordBtn.classList.add('recording');
+                recordBtn.textContent = 'Recording...';
+            } else if (isRecording) {
+                isRecording = false;
+                recordBtn.classList.remove('recording');
+                recordBtn.textContent = 'Record';
+            }
+        });
 
-        window.onload = () => {
-            loadLayout();
-            const dpr = window.devicePixelRatio || 1;
+        // Info Button
+        document.getElementById('info-btn').addEventListener('click', () => {
+            alert('migrain - Granular Synthesizer\n\nFeatures:\n- Upload audio files\n- Granular synthesis with adjustable parameters\n- Real-time audio processing\n- Light/Dark theme\n\nNo external dependencies.');
+        });
+
+        // Canvas interaction for waveform
+        canvas.addEventListener('click', (e) => {
+            if (!audioBuffer) return;
             const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-            setupAudioChain();
-            setupKnobs();
-            setupSquareSliders();
-            setupCustomScrollbar();
-            setupDraggablePanels();
-            updateCropOverlays();
-        };
+            const x = (e.clientX - rect.left) / rect.width;
+            if (granularNode && granularNode.parameters.has('playhead')) {
+                granularNode.parameters.get('playhead').value = Math.max(0, Math.min(1, x));
+            }
+        });
     </script>
 </body>
 
