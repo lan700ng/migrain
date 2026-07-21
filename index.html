@@ -195,7 +195,6 @@
             position: relative;
             overflow: hidden;
             border-radius: 8px 8px 0 0;
-            touch-action: none;
         }
 
         #waveform-canvas {
@@ -204,7 +203,6 @@
             background-color: var(--bg);
             cursor: crosshair;
             display: block;
-            touch-action: none;
         }
 
         .crop-overlay {
@@ -272,7 +270,6 @@
             flex-direction: column;
             gap: 8px;
             align-items: center;
-            touch-action: none;
         }
 
         .control label {
@@ -286,14 +283,12 @@
             width: 50px;
             height: 50px;
             cursor: ew-resize;
-            touch-action: none;
         }
 
         .knob-container svg {
             width: 100%;
             height: 100%;
             transform: rotate(135deg);
-            pointer-events: none;
         }
 
         .knob-track,
@@ -319,7 +314,6 @@
             cursor: pointer;
             border-radius: 12px;
             overflow: hidden;
-            touch-action: manipulation;
         }
 
         .square-slider-fill {
@@ -349,7 +343,8 @@
         }
 
         button,
-        .file-upload-wrapper label {
+        .file-upload-wrapper label,
+        a#github-btn {
             background-color: transparent;
             color: var(--text);
             border: 1px solid var(--outline);
@@ -365,7 +360,12 @@
             align-items: center;
             justify-content: center;
             text-decoration: none;
-            touch-action: manipulation;
+        }
+
+        #github-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
         }
 
         .file-upload-wrapper {
@@ -373,7 +373,8 @@
         }
 
         button:hover,
-        .file-upload-wrapper label:hover {
+        .file-upload-wrapper label:hover,
+        a#github-btn:hover {
             background-color: var(--outline);
         }
 
@@ -391,11 +392,6 @@
         .autoplay-controls {
             grid-column: 1 / -1;
             display: contents;
-        }
-
-        .effect-group.disabled .effect-controls {
-            opacity: 0.5;
-            pointer-events: none;
         }
     </style>
 </head>
@@ -527,6 +523,207 @@
                         </div>
                     </div>
                 </div>
+                <div class="effect-group" data-effect="compressor">
+                    <div class="effect-header">
+                        <h2>Compressor</h2>
+                        <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
+                            <div class="square-slider-fill"></div>
+                        </div>
+                    </div>
+                    <div class="effect-controls" style="display:none">
+                        <div class="control">
+                            <label>Threshold</label>
+                            <div class="knob-container" data-id="comp-threshold" data-min="-100" data-max="0" data-value="-24"></div>
+                        </div>
+                        <div class="control">
+                            <label>Ratio</label>
+                            <div class="knob-container" data-id="comp-ratio" data-min="1" data-max="20" data-value="4"></div>
+                        </div>
+                        <div class="control">
+                            <label>Knee</label>
+                            <div class="knob-container" data-id="comp-knee" data-min="0" data-max="40" data-value="30"></div>
+                        </div>
+                        <div class="control">
+                            <label>Attack</label>
+                            <div class="knob-container" data-id="comp-attack" data-min="0" data-max="1" data-value="0.003" data-step="0.001"></div>
+                        </div>
+                        <div class="control">
+                            <label>Release</label>
+                            <div class="knob-container" data-id="comp-release" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Makeup</label>
+                            <div class="knob-container" data-id="comp-makeupGain" data-min="0" data-max="20" data-value="1"></div>
+                        </div>
+                        <div class="control">
+                            <label>Auto Makeup</label>
+                            <div class="square-slider-container" data-id="comp-automakeup" data-checked="false" data-default-checked="false">
+                                <div class="square-slider-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="effect-group" data-effect="overdrive">
+                    <div class="effect-header">
+                        <h2>Overdrive</h2>
+                        <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
+                            <div class="square-slider-fill"></div>
+                        </div>
+                    </div>
+                    <div class="effect-controls" style="display:none">
+                        <div class="control">
+                            <label>Drive</label>
+                            <div class="knob-container" data-id="overdrive-drive" data-min="0" data-max="1" data-value="0.5" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Output</label>
+                            <div class="knob-container" data-id="overdrive-outputGain" data-min="0" data-max="1" data-value="0.5" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Curve</label>
+                            <div class="knob-container" data-id="overdrive-curveAmount" data-min="0" data-max="1" data-value="1" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Algorithm</label>
+                            <div class="knob-container" data-id="overdrive-algorithmIndex" data-min="0" data-max="5" data-value="0" data-step="1"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="effect-group" data-effect="chorus">
+                    <div class="effect-header">
+                        <h2>Chorus</h2>
+                        <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
+                            <div class="square-slider-fill"></div>
+                        </div>
+                    </div>
+                    <div class="effect-controls" style="display:none">
+                        <div class="control">
+                            <label>Rate</label>
+                            <div class="knob-container" data-id="chorus-rate" data-min="0.01" data-max="8" data-value="1.5" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Depth</label>
+                            <div class="knob-container" data-id="chorus-depth" data-min="0" data-max="1" data-value="0.7" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Feedback</label>
+                            <div class="knob-container" data-id="chorus-feedback" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Delay</label>
+                            <div class="knob-container" data-id="chorus-delay" data-min="0" data-max="0.1" data-value="0.0045" data-step="0.0001"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="effect-group" data-effect="phaser">
+                    <div class="effect-header">
+                        <h2>Phaser</h2>
+                        <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
+                            <div class="square-slider-fill"></div>
+                        </div>
+                    </div>
+                    <div class="effect-controls" style="display:none">
+                        <div class="control">
+                            <label>Rate</label>
+                            <div class="knob-container" data-id="phaser-rate" data-min="0.01" data-max="8" data-value="1.2" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Depth</label>
+                            <div class="knob-container" data-id="phaser-depth" data-min="0" data-max="1" data-value="0.3" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Feedback</label>
+                            <div class="knob-container" data-id="phaser-feedback" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Phase</label>
+                            <div class="knob-container" data-id="phaser-stereoPhase" data-min="0" data-max="180" data-value="30" data-step="1"></div>
+                        </div>
+                        <div class="control">
+                            <label>Base Freq</label>
+                            <div class="knob-container" data-id="phaser-baseModulationFrequency" data-min="500" data-max="1500" data-value="700" data-step="1"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="effect-group" data-effect="tremolo">
+                    <div class="effect-header">
+                        <h2>Tremolo</h2>
+                        <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
+                            <div class="square-slider-fill"></div>
+                        </div>
+                    </div>
+                    <div class="effect-controls" style="display:none">
+                        <div class="control">
+                            <label>Intensity</label>
+                            <div class="knob-container" data-id="tremolo-intensity" data-min="0" data-max="1" data-value="0.3" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Rate</label>
+                            <div class="knob-container" data-id="tremolo-rate" data-min="0.01" data-max="8" data-value="5" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Phase</label>
+                            <div class="knob-container" data-id="tremolo-stereoPhase" data-min="0" data-max="180" data-value="0" data-step="1"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="effect-group" data-effect="delay">
+                    <div class="effect-header">
+                        <h2>Delay</h2>
+                        <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
+                            <div class="square-slider-fill"></div>
+                        </div>
+                    </div>
+                    <div class="effect-controls" style="display:none">
+                        <div class="control">
+                            <label>Time</label>
+                            <div class="knob-container" data-id="delay-time" data-min="1" data-max="2000" data-value="350" step="1"></div>
+                        </div>
+                        <div class="control">
+                            <label>Feedback</label>
+                            <div class="knob-container" data-id="delay-feedback" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Cutoff</label>
+                            <div class="knob-container" data-id="delay-cutoff" data-min="20" data-max="20000" data-value="2000" step="1"></div>
+                        </div>
+                        <div class="control">
+                            <label>Mix</label>
+                            <div class="knob-container" data-id="delay-mix" data-min="0" data-max="1" data-value="0.25" data-step="0.01"></div>
+                        </div>
+                        <div class="control" style="grid-column:1 / -1;width:100%"><button id="stop-delay-btn">Stop Sound</button></div>
+                    </div>
+                </div>
+                <div class="effect-group" data-effect="reverb">
+                    <div class="effect-header">
+                        <h2>Reverb</h2>
+                        <div class="square-slider-container group-toggle" data-checked="false" data-default-checked="false">
+                            <div class="square-slider-fill"></div>
+                        </div>
+                    </div>
+                    <div class="effect-controls" style="display:none">
+                        <div class="control">
+                            <label>Dry</label>
+                            <div class="knob-container" data-id="reverb-dryLevel" data-min="0" data-max="1" data-value="1" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Wet</label>
+                            <div class="knob-container" data-id="reverb-wetLevel" data-min="0" data-max="1" data-value="0.2" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Level</label>
+                            <div class="knob-container" data-id="reverb-level" data-min="0" data-max="2" data-value="1" data-step="0.01"></div>
+                        </div>
+                        <div class="control">
+                            <label>Damping</label>
+                            <div class="knob-container" data-id="reverb-highCut" data-min="20" data-max="22050" data-value="22050" step="1"></div>
+                        </div>
+                        <div class="control">
+                            <label>Low Cut</label>
+                            <div class="knob-container" data-id="reverb-lowCut" data-min="20" data-max="22050" data-value="20" step="1"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div id="custom-scrollbar">
                 <div id="scrollbar-thumb"></div>
@@ -541,22 +738,22 @@
                 </div>
                 <button id="record-btn">Record</button>
                 <button id="reset-btn">Reset All</button>
-                <button id="info-btn">Info</button>
+                <a href="https://github.com/lan700ng" target="_blank" rel="noopener noreferrer" id="github-btn">
+                    <svg viewBox="0 0 16 16" version="1.1" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+                    </svg>
+                </a>
             </div>
         </div>
     </div>
     <script>
-        // Multi-touch tracking
-        const activeTouches = new Map();
-        
-        // Initialize Audio Context
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const audioContext = new(window.AudioContext || window.webkitAudioContext)();
         let audioBuffer = null;
         let granularNode = null;
         let filterNode = null;
         let pannerNode = null;
         let isPlaying = false;
-        
+        let activeCanvasTouchId = null;
         const fileUpload = document.getElementById('audio-upload');
         const canvas = document.getElementById('waveform-canvas');
         const ctx = canvas.getContext('2d');
@@ -565,15 +762,10 @@
         const instructions = document.getElementById('instructions');
         const resetBtn = document.getElementById('reset-btn');
         const recordBtn = document.getElementById('record-btn');
-        const autoplayBtn = document.getElementById('autoplay-btn');
-        const cropOverlayStart = document.getElementById('crop-overlay-start');
-        const cropOverlayEnd = document.getElementById('crop-overlay-end');
-        
         let isRecording = false;
         let recorderNode = null;
         let recordedData = [];
         let effects = {};
-        
         let autoplayState = {
             isPlaying: false,
             direction: false,
@@ -584,8 +776,9 @@
             startTime: 0,
             frameId: null
         };
-
-        // Granular Processor Code
+        const autoplayBtn = document.getElementById('autoplay-btn');
+        const cropOverlayStart = document.getElementById('crop-overlay-start');
+        const cropOverlayEnd = document.getElementById('crop-overlay-end');
         const granularProcessorCode = `
             class GranularProcessor extends AudioWorkletProcessor {
                 constructor() {
@@ -720,6 +913,7 @@
                             noiseR = this._brownLastOut_R * 3.5;
                         }
 
+
                         for (const grain of this.grains) {
                             const progress = grain.playbackPosition / grain.totalDurationSamples;
                             if (progress >= 0 && progress < 1) {
@@ -779,77 +973,59 @@
             }
             registerProcessor('granular-processor', GranularProcessor);
         `;
-
-        // Setup Audio Chain
         async function setupAudioChain() {
             try {
-                const blob = new Blob([granularProcessorCode], { type: 'application/javascript' });
+                const blob = new Blob([granularProcessorCode], {
+                    type: 'application/javascript'
+                });
                 const workletURL = URL.createObjectURL(blob);
                 await audioContext.audioWorklet.addModule(workletURL);
-                
                 granularNode = new AudioWorkletNode(audioContext, 'granular-processor', {
                     outputChannelCount: [2]
                 });
-                
                 effects.inputGain = audioContext.createGain();
                 filterNode = audioContext.createBiquadFilter();
                 pannerNode = audioContext.createStereoPanner();
-                
+                granularNode.connect(effects.inputGain);
                 effects.inputGain.connect(filterNode);
                 filterNode.connect(pannerNode);
                 pannerNode.connect(audioContext.destination);
-                granularNode.connect(effects.inputGain);
-                
                 instructions.textContent = 'Ready! Upload an audio file.';
             } catch (e) {
                 console.error('Audio setup failed:', e);
-                instructions.textContent = 'Audio setup failed. Please refresh.';
             }
         }
-
         setupAudioChain();
-
-        // Load Audio File
         fileUpload.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-
             try {
                 const arrayBuffer = await file.arrayBuffer();
                 audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-                
                 const channels = [];
                 for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
                     channels.push(audioBuffer.getChannelData(i));
                 }
-                granularNode.port.postMessage({ buffers: channels });
-                
+                granularNode.port.postMessage({
+                    buffers: channels
+                });
                 drawWaveform(audioBuffer);
                 instructions.textContent = 'Loaded: ' + file.name;
             } catch (e) {
-                console.error('Failed to load audio:', e);
-                instructions.textContent = 'Failed to load audio file.';
+                instructions.textContent = 'Error loading audio file';
             }
         });
-
-        // Draw Waveform
         function drawWaveform(buffer) {
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-            
             const width = canvas.width;
             const height = canvas.height;
             ctx.fillStyle = getComputedStyle(canvas).backgroundColor;
             ctx.fillRect(0, 0, width, height);
-
             const data = buffer.getChannelData(0);
             const step = Math.ceil(data.length / width);
             const amp = height / 2;
-
-            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
             ctx.lineWidth = 1;
             ctx.beginPath();
-
             for (let i = 0; i < width; i++) {
                 let min = 1.0;
                 let max = -1.0;
@@ -862,26 +1038,20 @@
             }
             ctx.stroke();
         }
-
-        // Knob Rendering
         function renderKnob(container) {
             const min = parseFloat(container.dataset.min);
             const max = parseFloat(container.dataset.max);
             const value = parseFloat(container.dataset.value);
-            
             const normalizedValue = (value - min) / (max - min);
             const startAngle = Math.PI * 0.75;
             const endAngle = Math.PI * 2.25;
-
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', '0 0 100 100');
-
             const track = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             track.setAttribute('cx', '50');
             track.setAttribute('cy', '50');
             track.setAttribute('r', '40');
             track.classList.add('knob-track');
-
             const fill = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             fill.setAttribute('cx', '50');
             fill.setAttribute('cy', '50');
@@ -889,316 +1059,270 @@
             fill.classList.add('knob-fill');
             fill.setAttribute('stroke-dasharray', `${(endAngle - startAngle) * 40} ${Math.PI * 80}`);
             fill.setAttribute('stroke-dashoffset', `${(1 - normalizedValue) * (endAngle - startAngle) * 40}`);
-
             svg.appendChild(track);
             svg.appendChild(fill);
             container.innerHTML = '';
             container.appendChild(svg);
         }
-
-        // Initialize all knobs and controls
         document.querySelectorAll('.knob-container').forEach(container => {
             renderKnob(container);
-            container.addEventListener('pointerdown', handleKnobStart);
-            container.addEventListener('touchstart', handleKnobStart, { passive: false });
+            container.addEventListener('touchstart', handleKnobInteraction, {
+                passive: false
+            });
+            container.addEventListener('mousedown', handleKnobInteraction);
         });
-
-        // Knob Start Handler - Multi-touch support
-        function handleKnobStart(e) {
+        function handleKnobInteraction(e) {
             e.preventDefault();
             const container = e.currentTarget;
-            const pointerId = e.pointerId !== undefined ? e.pointerId : 'touch-' + (e.touches ? e.touches[0].identifier : 0);
-            
             const min = parseFloat(container.dataset.min);
             const max = parseFloat(container.dataset.max);
             const step = parseFloat(container.dataset.step) || (max - min) / 100;
-            let currentValue = parseFloat(container.dataset.value);
-            const startX = e.clientX || e.touches[0].clientX;
-            const startY = e.clientY || e.touches[0].clientY;
-
-            activeTouches.set(pointerId, {
-                type: 'knob',
-                container,
-                min, max, step,
-                startValue: currentValue,
-                startX, startY
-            });
-
+            let startValue = parseFloat(container.dataset.value);
+            let startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            let startY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+            const touchId = e.type.includes('touch') ? e.touches[0].identifier : null;
             function onMove(moveEvent) {
-                const touch = activeTouches.get(pointerId);
-                if (!touch) return;
-
-                const clientX = moveEvent.clientX || moveEvent.touches?.[0]?.clientX;
-                const clientY = moveEvent.clientY || moveEvent.touches?.[0]?.clientY;
-                
-                if (!clientX) return;
-
-                const deltaX = clientX - touch.startX;
-                const deltaY = moveEvent.clientY || moveEvent.touches?.[0]?.clientY - touch.startY;
-                
-                // X: horizontal fine control, Y: vertical coarse control
-                const delta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY * 2;
-                currentValue = Math.max(touch.min, Math.min(touch.max, touch.startValue + (delta / 100) * touch.step));
-                
-                container.dataset.value = currentValue;
+                let clientX, clientY;
+                if (moveEvent.type.includes('touch')) {
+                    let touch = Array.from(moveEvent.touches).find(t => t.identifier === touchId);
+                    if (!touch) return;
+                    clientX = touch.clientX;
+                    clientY = touch.clientY;
+                } else {
+                    clientX = moveEvent.clientX;
+                    clientY = moveEvent.clientY;
+                }
+                const deltaX = clientX - startX;
+                const deltaY = startY - clientY;
+                const delta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
+                let newValue = startValue + (delta / 100) * step;
+                newValue = Math.max(min, Math.min(max, newValue));
+                container.dataset.value = newValue;
                 renderKnob(container);
-                updateAudioParameter(container.dataset.id, currentValue);
+                updateAudioParameter(container.dataset.id, newValue);
             }
-
-            function onEnd() {
-                activeTouches.delete(pointerId);
-                document.removeEventListener('pointermove', onMove);
+            function onEnd(endEvent) {
+                if (endEvent.type.includes('touch')) {
+                    let touch = Array.from(endEvent.changedTouches).find(t => t.identifier === touchId);
+                    if (!touch) return;
+                }
                 document.removeEventListener('touchmove', onMove);
-                document.removeEventListener('pointerup', onEnd);
+                document.removeEventListener('mousemove', onMove);
                 document.removeEventListener('touchend', onEnd);
+                document.removeEventListener('mouseup', onEnd);
             }
-
-            document.addEventListener('pointermove', onMove);
-            document.addEventListener('touchmove', onMove, { passive: false });
-            document.addEventListener('pointerup', onEnd);
+            document.addEventListener('touchmove', onMove, {
+                passive: false
+            });
+            document.addEventListener('mousemove', onMove);
             document.addEventListener('touchend', onEnd);
+            document.addEventListener('mouseup', onEnd);
         }
-
-        // Update Audio Parameters
         function updateAudioParameter(id, value) {
             if (!granularNode) return;
-
-            const paramMapping = {
-                'input-gain': { param: 'none', fn: () => effects.inputGain.gain.value = value },
-                'preview-filter-type': { param: 'none', fn: () => filterNode.type = ['lowpass', 'highpass', 'bandpass', 'lowshelf', 'highshelf', 'peaking', 'notch', 'allpass'][Math.floor(value)] },
-                'preview-filter-q': { param: 'none', fn: () => filterNode.Q.value = value },
-                'grain-size': { param: 'grainSize' },
-                'grain-density': { param: 'grainDensity' },
-                'pitch': { param: 'pitch' },
-                'pitch-jitter': { param: 'pitchJitter' },
-                'grain-jitter': { param: 'grainJitter' },
-                'spread': { param: 'spread' },
-                'pan': { param: 'none', fn: () => pannerNode.pan.value = value },
-                'reverse-chance': { param: 'reverseChance' },
-                'noise-amount': { param: 'noiseAmount' },
-                'noise-type': { param: 'noiseType' },
-                'pitch-sync': { param: 'pitchSync' },
-                'autoplay-crop-start': { param: 'none', fn: () => { autoplayState.cropStart = value; cropOverlayStart.style.width = (value * 100) + '%'; } },
-                'autoplay-crop-end': { param: 'none', fn: () => { autoplayState.cropEnd = value; cropOverlayEnd.style.width = ((1 - value) * 100) + '%'; } },
-                'autoplay-speed': { param: 'none', fn: () => autoplayState.speed = value },
-                'autoplay-vertical-pos': { param: 'none', fn: () => autoplayState.verticalPos = value }
+            const idMap = {
+                'input-gain': () => effects.inputGain.gain.value = value,
+                'preview-filter-type': () => filterNode.type = ['lowpass', 'highpass', 'bandpass', 'lowshelf', 'highshelf', 'peaking', 'notch', 'allpass'][Math.floor(value)],
+                'preview-filter-q': () => filterNode.Q.value = value,
+                'grain-size': 'grainSize',
+                'grain-density': 'grainDensity',
+                'pitch': 'pitch',
+                'pitch-jitter': 'pitchJitter',
+                'grain-jitter': 'grainJitter',
+                'spread': 'spread',
+                'pan': () => pannerNode.pan.value = value,
+                'reverse-chance': 'reverseChance',
+                'noise-amount': 'noiseAmount',
+                'noise-type': 'noiseType',
+                'pitch-sync': 'pitchSync',
+                'autoplay-crop-start': () => {
+                    autoplayState.cropStart = value;
+                    cropOverlayStart.style.width = value * 100 + '%';
+                },
+                'autoplay-crop-end': () => {
+                    autoplayState.cropEnd = value;
+                    cropOverlayEnd.style.width = (1 - value) * 100 + '%';
+                },
+                'autoplay-speed': () => autoplayState.speed = value,
+                'autoplay-vertical-pos': () => autoplayState.verticalPos = value
             };
-
-            const mapping = paramMapping[id];
-            if (mapping) {
-                if (mapping.param && granularNode.parameters.has(mapping.param)) {
-                    granularNode.parameters.get(mapping.param).value = value;
-                }
-                if (mapping.fn) mapping.fn();
+            const action = idMap[id];
+            if (typeof action === 'function') {
+                action();
+            } else if (typeof action === 'string' && granularNode.parameters.has(action)) {
+                granularNode.parameters.get(action).value = value;
             }
         }
-
-        // Square Slider Handler - Multi-touch support
         document.querySelectorAll('.square-slider-container').forEach(slider => {
-            slider.addEventListener('pointerdown', handleSliderClick);
-            slider.addEventListener('touchstart', handleSliderClick, { passive: false });
-        });
-
-        function handleSliderClick(e) {
-            e.preventDefault();
-            const slider = e.currentTarget;
-            const checked = slider.dataset.checked === 'true';
-            slider.dataset.checked = !checked;
-            
-            if (slider.dataset.id === 'theme-toggle') {
-                const theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
-                document.body.dataset.theme = theme;
-            }
-            
-            const groupToggle = slider.closest('.effect-group');
-            if (groupToggle && slider.classList.contains('group-toggle')) {
-                const controls = groupToggle.querySelector('.effect-controls');
-                controls.style.display = checked ? 'none' : 'grid';
-            }
-        }
-
-        // Canvas X-Y interaction
-        canvas.addEventListener('pointerdown', handleCanvasStart);
-        canvas.addEventListener('touchstart', handleCanvasStart, { passive: false });
-
-        function handleCanvasStart(e) {
-            e.preventDefault();
-            if (!audioBuffer || !granularNode) return;
-
-            const pointerId = e.pointerId !== undefined ? e.pointerId : 'canvas-' + (e.touches ? e.touches[0].identifier : 0);
-            const rect = canvas.getBoundingClientRect();
-            const startX = (e.clientX || e.touches[0].clientX) - rect.left;
-            const startY = (e.clientY || e.touches[0].clientY) - rect.top;
-
-            activeTouches.set(pointerId, {
-                type: 'canvas',
-                startX, startY,
-                rect
+            slider.addEventListener('click', function() {
+                const checked = this.dataset.checked === 'true';
+                this.dataset.checked = !checked;
+                if (this.dataset.id === 'theme-toggle') {
+                    const theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+                    document.body.dataset.theme = theme;
+                }
+                const group = this.closest('.effect-group');
+                if (group && this.classList.contains('group-toggle')) {
+                    const controls = group.querySelector('.effect-controls');
+                    controls.style.display = checked ? 'none' : 'grid';
+                }
             });
-
-            function onMove(moveEvent) {
-                const touch = activeTouches.get(pointerId);
-                if (!touch) return;
-
-                const clientX = moveEvent.clientX || moveEvent.touches?.[0]?.clientX;
-                const clientY = moveEvent.clientY || moveEvent.touches?.[0]?.clientY;
-                
-                if (!clientX) return;
-
-                const x = (clientX - touch.rect.left) / touch.rect.width;
-                const y = (clientY - touch.rect.top) / touch.rect.height;
-                
-                const playhead = Math.max(0, Math.min(1, x));
-                const verticalPos = Math.max(0, Math.min(1, y));
-                
-                if (granularNode.parameters.has('playhead')) {
-                    granularNode.parameters.get('playhead').value = playhead;
-                }
-                playIndicatorV.style.left = (playhead * 100) + '%';
-                playIndicatorH.style.top = (verticalPos * 100) + '%';
-            }
-
-            function onEnd() {
-                activeTouches.delete(pointerId);
-                document.removeEventListener('pointermove', onMove);
-                document.removeEventListener('touchmove', onMove);
-                document.removeEventListener('pointerup', onEnd);
-                document.removeEventListener('touchend', onEnd);
-            }
-
-            document.addEventListener('pointermove', onMove);
-            document.addEventListener('touchmove', onMove, { passive: false });
-            document.addEventListener('pointerup', onEnd);
-            document.addEventListener('touchend', onEnd);
-        }
-
-        // Draggable Section Handler - Multi-touch support
-        document.querySelectorAll('.drag-handle').forEach(handle => {
-            handle.addEventListener('pointerdown', handleDragStart);
-            handle.addEventListener('touchstart', handleDragStart, { passive: false });
         });
-
-        function handleDragStart(e) {
-            e.preventDefault();
-            const handle = e.currentTarget;
-            const section = handle.closest('.draggable-section');
-            const pointerId = e.pointerId !== undefined ? e.pointerId : 'drag-' + (e.touches ? e.touches[0].identifier : 0);
-            
-            const startX = e.clientX || e.touches[0].clientX;
-            const startY = e.clientY || e.touches[0].clientY;
-            let currentX = parseFloat(section.style.transform.match(/translateX\((.+)px\)/) ? section.style.transform.match(/translateX\((.+)px\)/)[1] : 0);
-            let currentY = parseFloat(section.style.transform.match(/translateY\((.+)px\)/) ? section.style.transform.match(/translateY\((.+)px\)/)[1] : 0);
-
-            section.classList.add('is-dragging');
-            activeTouches.set(pointerId, { type: 'drag', section, startX, startY, currentX, currentY });
-
-            function onMove(moveEvent) {
-                const touch = activeTouches.get(pointerId);
-                if (!touch) return;
-
-                const clientX = moveEvent.clientX || moveEvent.touches?.[0]?.clientX;
-                const clientY = moveEvent.clientY || moveEvent.touches?.[0]?.clientY;
-                
-                if (!clientX) return;
-
-                const deltaX = clientX - touch.startX;
-                const deltaY = clientY - touch.startY;
-
-                touch.section.style.transform = `translate(${touch.currentX + deltaX}px, ${touch.currentY + deltaY}px)`;
-            }
-
-            function onEnd() {
-                const touch = activeTouches.get(pointerId);
-                if (touch) {
-                    touch.section.classList.remove('is-dragging');
-                    activeTouches.delete(pointerId);
-                }
-                document.removeEventListener('pointermove', onMove);
-                document.removeEventListener('touchmove', onMove);
-                document.removeEventListener('pointerup', onEnd);
-                document.removeEventListener('touchend', onEnd);
-            }
-
-            document.addEventListener('pointermove', onMove);
-            document.addEventListener('touchmove', onMove, { passive: false });
-            document.addEventListener('pointerup', onEnd);
-            document.addEventListener('touchend', onEnd);
-        }
-
-        // Play/Stop Controls
         let currentSource = null;
-        autoplayBtn.addEventListener('click', () => {
-            if (autoplayState.isPlaying) {
-                stopAutoplay();
-            } else if (audioBuffer) {
-                startAutoplay();
-            }
-        });
-
+        let currentGain = null;
+        const autoplayBtn = document.getElementById('autoplay-btn');
+        if (autoplayBtn) {
+            autoplayBtn.addEventListener('click', () => {
+                if (autoplayState.isPlaying) {
+                    stopAutoplay();
+                } else if (audioBuffer) {
+                    startAutoplay();
+                }
+            });
+        }
         function startAutoplay() {
-            if (!audioBuffer || !granularNode) return;
-            
+            if (!audioBuffer) return;
             autoplayState.isPlaying = true;
             autoplayBtn.classList.add('playing');
-            
-            if (currentSource) currentSource.stop();
+            if (currentSource) {
+                try {
+                    currentSource.stop();
+                } catch (e) {}
+            }
             currentSource = audioContext.createBufferSource();
+            currentGain = audioContext.createGain();
             currentSource.buffer = audioBuffer;
-            currentSource.connect(effects.inputGain);
-            
-            const cropStart = autoplayState.cropStart * audioBuffer.duration;
-            const cropEnd = autoplayState.cropEnd * audioBuffer.duration;
-            currentSource.start(audioContext.currentTime, cropStart, cropEnd - cropStart);
+            currentSource.connect(currentGain);
+            currentGain.connect(effects.inputGain);
+            const duration = audioBuffer.duration;
+            const startTime = autoplayState.cropStart * duration;
+            const endTime = autoplayState.cropEnd * duration;
+            const playDuration = (endTime - startTime) / autoplayState.speed;
+            currentSource.playbackRate.value = autoplayState.speed;
+            currentSource.start(audioContext.currentTime, startTime, playDuration);
+            setTimeout(() => {
+                stopAutoplay();
+            }, playDuration * 1000);
         }
-
         function stopAutoplay() {
             autoplayState.isPlaying = false;
             autoplayBtn.classList.remove('playing');
             if (currentSource) {
-                currentSource.stop();
+                try {
+                    currentSource.stop();
+                } catch (e) {}
                 currentSource = null;
             }
         }
-
-        // Reset Button
         resetBtn.addEventListener('click', () => {
-            document.querySelectorAll('[data-id]').forEach(el => {
-                if (el.dataset.defaultChecked !== undefined) {
-                    el.dataset.checked = el.dataset.defaultChecked;
-                } else if (el.dataset.value !== undefined) {
-                    el.dataset.value = parseFloat(el.dataset.value);
-                    if (el.classList.contains('knob-container')) {
-                        renderKnob(el);
-                        updateAudioParameter(el.dataset.id, parseFloat(el.dataset.value));
-                    }
+            document.querySelectorAll('[data-value]').forEach(el => {
+                el.dataset.value = el.dataset.value;
+                if (el.classList.contains('knob-container')) {
+                    renderKnob(el);
+                    updateAudioParameter(el.dataset.id, parseFloat(el.dataset.value));
                 }
             });
+            document.querySelectorAll('[data-checked]').forEach(el => {
+                el.dataset.checked = el.dataset.defaultChecked;
+            });
         });
-
-        // Record Button
-        recordBtn.addEventListener('click', async () => {
-            if (!isRecording && audioContext.state === 'running') {
-                isRecording = true;
-                recordBtn.classList.add('recording');
-                recordBtn.textContent = 'Recording...';
-            } else if (isRecording) {
-                isRecording = false;
-                recordBtn.classList.remove('recording');
-                recordBtn.textContent = 'Record';
+        let canvasDragData = null;
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!audioBuffer) return;
+            activeCanvasTouchId = e.touches[0].identifier;
+            canvasDragData = {
+                startX: e.touches[0].clientX,
+                startY: e.touches[0].clientY,
+                rect: canvas.getBoundingClientRect()
+            };
+        }, {
+            passive: false
+        });
+        canvas.addEventListener('mousedown', (e) => {
+            if (!audioBuffer) return;
+            canvasDragData = {
+                startX: e.clientX,
+                startY: e.clientY,
+                rect: canvas.getBoundingClientRect()
+            };
+        });
+        document.addEventListener('touchmove', (e) => {
+            if (!canvasDragData || !audioBuffer) return;
+            let touch = Array.from(e.touches).find(t => t.identifier === activeCanvasTouchId);
+            if (!touch) return;
+            const x = (touch.clientX - canvasDragData.rect.left) / canvasDragData.rect.width;
+            const y = (touch.clientY - canvasDragData.rect.top) / canvasDragData.rect.height;
+            updateCanvasPosition(x, y);
+        }, {
+            passive: false
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (!canvasDragData || !audioBuffer) return;
+            const x = (e.clientX - canvasDragData.rect.left) / canvasDragData.rect.width;
+            const y = (e.clientY - canvasDragData.rect.top) / canvasDragData.rect.height;
+            updateCanvasPosition(x, y);
+        });
+        function updateCanvasPosition(x, y) {
+            x = Math.max(0, Math.min(1, x));
+            y = Math.max(0, Math.min(1, y));
+            if (granularNode && granularNode.parameters.has('playhead')) {
+                granularNode.parameters.get('playhead').value = x;
             }
+            playIndicatorV.style.left = x * 100 + '%';
+            playIndicatorH.style.top = y * 100 + '%';
+        }
+        document.addEventListener('touchend', () => {
+            canvasDragData = null;
         });
-
-        // Info Button
-        document.getElementById('info-btn').addEventListener('click', () => {
-            alert('migrain - Granular Synthesizer\n\nFeatures:\n- Upload audio files\n- Granular synthesis with adjustable parameters\n- Real-time audio processing\n- Light/Dark theme\n- Multi-touch support\n\nNo external dependencies.');
+        document.addEventListener('mouseup', () => {
+            canvasDragData = null;
         });
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (audioBuffer) {
-                drawWaveform(audioBuffer);
+        let draggedElement = null;
+        let dragOffset = {
+            x: 0,
+            y: 0
+        };
+        document.querySelectorAll('.drag-handle').forEach(handle => {
+            handle.addEventListener('mousedown', startDrag);
+            handle.addEventListener('touchstart', startDrag, {
+                passive: false
+            });
+        });
+        function startDrag(e) {
+            e.preventDefault();
+            draggedElement = e.target.closest('.draggable-section');
+            if (!draggedElement) return;
+            const rect = draggedElement.getBoundingClientRect();
+            dragOffset.x = (e.type === 'touchstart' ? e.touches[0].clientX : e.clientX) - rect.left;
+            dragOffset.y = (e.type === 'touchstart' ? e.touches[0].clientY : e.clientY) - rect.top;
+            draggedElement.classList.add('is-dragging');
+            document.addEventListener('mousemove', doDrag);
+            document.addEventListener('touchmove', doDrag, {
+                passive: false
+            });
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+        }
+        function doDrag(e) {
+            if (!draggedElement) return;
+            e.preventDefault();
+            const x = (e.type.includes('touch') ? e.touches[0].clientX : e.clientX);
+            const y = (e.type.includes('touch') ? e.touches[0].clientY : e.clientY);
+            const newX = x - dragOffset.x;
+            const newY = y - dragOffset.y;
+            draggedElement.style.transform = `translate(${newX}px, ${newY}px)`;
+        }
+        function endDrag() {
+            if (draggedElement) {
+                draggedElement.classList.remove('is-dragging');
+                draggedElement = null;
             }
-        });
+            document.removeEventListener('mousemove', doDrag);
+            document.removeEventListener('touchmove', doDrag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchend', endDrag);
+        }
     </script>
 </body>
 
