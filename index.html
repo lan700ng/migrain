@@ -440,7 +440,7 @@
         .control {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 4px;
             align-items: center;
         }
 
@@ -452,8 +452,8 @@
 
         .knob-container {
             position: relative;
-            width: 50px;
-            height: 50px;
+            width: 65px;
+            height: 65px;
             cursor: ew-resize;
         }
 
@@ -466,8 +466,9 @@
         .knob-track,
         .knob-fill {
             fill: none;
-            stroke-width: 12;
+            stroke-width: 14.5;
             stroke-linecap: round;
+            transition: stroke 0.2s;
         }
 
         .knob-track {
@@ -476,6 +477,20 @@
 
         .knob-fill {
             stroke: var(--accent);
+        }
+        
+        .knob-value-display {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            background: var(--bg);
+            border: 1px solid var(--outline);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.75rem;
+            margin-top: 4px;
+            color: var(--text-secondary);
+            min-width: 40px;
+            text-align: center;
+            transition: color 0.2s, border-color 0.2s;
         }
 
         .square-slider-container {
@@ -627,7 +642,7 @@
                     <div class="effect-controls">
                         <div class="control">
                             <label>Input Gain</label>
-                            <div class="knob-container" data-id="input-gain" data-min="0.1" data-max="10" data-value="1" data-step="0.01"></div>
+                            <div class="knob-container" data-id="input-gain" data-min="0" data-max="100" data-value="50" data-step="0.1"></div>
                         </div>
                         <div class="control">
                             <label>Filter Type</label>
@@ -656,6 +671,10 @@
                         <div class="autoplay-controls">
                             <div class="control" style="grid-column: 1 / -1; width: 100%;">
                                 <button id="autoplay-btn">Autoplay</button>
+                            </div>
+                            <div class="control">
+                                <label>Seek</label>
+                                <div class="knob-container" data-id="autoplay-seek" data-min="0" data-max="100" data-value="0" data-step="0.1"></div>
                             </div>
                             <div class="control">
                                 <label>Crop Start</label>
@@ -1064,11 +1083,14 @@
             if (!audioBuffer || !granularNode || !effects.inputGain) return;
             isPlaying = true;
             const now = audioContext.currentTime;
-            granularNode.parameters.get('playing').setValueAtTime(1, now);
+            
+            const playParam = granularNode.parameters.get('playing');
+            playParam.cancelScheduledValues(now); 
+            playParam.setValueAtTime(1, now);
             
             const gainParam = effects.inputGain.gain;
             const inputGainKnob = document.querySelector('.knob-container[data-id="input-gain"]');
-            const baseGain = inputGainKnob ? parseFloat(inputGainKnob.dataset.value) : 1.0;
+            const baseGain = inputGainKnob ? parseFloat(inputGainKnob.dataset.value) / 50.0 : 1.0;
 
             gainParam.cancelScheduledValues(now);
             const currentGain = gainParam.value;
@@ -1128,18 +1150,20 @@
             isPlaying = false;
             
             const now = audioContext.currentTime;
-            if (filterNode) filterNode.frequency.setTargetAtTime(20000, now, 0.01);
             
             if (effects.inputGain && granularNode) {
                 const gainParam = effects.inputGain.gain;
                 gainParam.cancelScheduledValues(now);
+                
                 const currentGain = gainParam.value;
                 gainParam.setValueAtTime(currentGain, now);
                 
                 const rel = Math.max(0.001, adsr.release);
                 gainParam.linearRampToValueAtTime(0, now + rel);
                 
-                granularNode.parameters.get('playing').setValueAtTime(0, now + rel);
+                const playParam = granularNode.parameters.get('playing');
+                playParam.cancelScheduledValues(now); 
+                playParam.setValueAtTime(0, now + rel);
             }
             hidePlayIndicator();
         }
@@ -1160,7 +1184,7 @@
             if (!granularNode) return;
             const paramName = id.replace(/-./g, x => x[1].toUpperCase());
             if (paramName === 'inputGain') {
-                effects.inputGain.gain.setTargetAtTime(value, audioContext.currentTime, 0.01);
+                effects.inputGain.gain.setTargetAtTime(value / 50.0, audioContext.currentTime, 0.01);
             } else if (paramName === 'envAttack') {
                 adsr.attack = value;
             } else if (paramName === 'envDecay') {
@@ -1186,6 +1210,16 @@
                 autoplayState.verticalPos = value;
             } else if (paramName === 'autoplayDirection') {
                 autoplayState.direction = value;
+            } else if (paramName === 'autoplaySeek') {
+                if (autoplayState.isPlaying && audioBuffer) {
+                    const cropRange = autoplayState.cropEnd - autoplayState.cropStart;
+                    if (cropRange > 0) {
+                        const loopDuration = (audioBuffer.duration * cropRange) / autoplayState.speed;
+                        let targetProgress = value / 100;
+                        if (autoplayState.direction) targetProgress = 1 - targetProgress;
+                        autoplayState.startTime = performance.now() - (targetProgress * loopDuration * 1000);
+                    }
+                }
             } else if (granularNode.parameters.has(paramName)) {
                 granularNode.parameters.get(paramName).setTargetAtTime(value, audioContext.currentTime, 0.01);
             } else if (paramName === 'pan' && pannerNode) {
@@ -1373,6 +1407,12 @@
                 let value = parseFloat(container.dataset.value);
                 container.dataset.defaultValue = value;
                 const id = container.dataset.id;
+                
+                const controlDiv = container.closest('.control');
+                const valueDisplay = document.createElement('div');
+                valueDisplay.className = 'knob-value-display';
+                if(controlDiv) controlDiv.appendChild(valueDisplay);
+
                 const svgNS = "http://www.w3.org/2000/svg";
                 const svg = document.createElementNS(svgNS, "svg");
                 svg.setAttribute("viewBox", "0 0 100 100");
@@ -1394,17 +1434,49 @@
                 svg.appendChild(track);
                 svg.appendChild(fill);
                 container.appendChild(svg);
+                
+                container.isDragging = false;
+                
                 const updateFill = (val) => {
                     const percentage = (val - min) / (max - min);
                     const fillLength = arcLength * percentage;
                     fill.setAttribute("stroke-dasharray", `${fillLength} ${circumference - fillLength}`);
                 };
-                container.setValue = (newValue) => {
+                
+                container.setValue = (newValue, trigger = true) => {
                     value = Math.max(min, Math.min(max, newValue));
                     container.dataset.value = value;
                     updateFill(value);
-                    updateAudioParameter(id, value);
+                    
+                    if (valueDisplay) {
+                        let decimals = 0;
+                        const step = container.dataset.step;
+                        if (step && step.includes('.')) {
+                            decimals = step.split('.')[1].length;
+                        }
+                        let displayStr = value.toFixed(decimals);
+                        if (id === 'input-gain' || id === 'autoplay-seek') displayStr += '%';
+                        
+                        if (valueDisplay.textContent !== displayStr) {
+                            valueDisplay.textContent = displayStr;
+                        }
+                    }
+
+                    if (id === 'input-gain') {
+                        if (value >= 70) {
+                            fill.style.stroke = 'var(--record)';
+                            valueDisplay.style.color = 'var(--record)';
+                            valueDisplay.style.borderColor = 'var(--record)';
+                        } else {
+                            fill.style.stroke = '';
+                            valueDisplay.style.color = '';
+                            valueDisplay.style.borderColor = '';
+                        }
+                    }
+
+                    if (trigger) updateAudioParameter(id, value);
                 };
+                
                 const onDragStart = (startX) => {
                     const valueOnStart = value;
                     const onDrag = (currentX) => {
@@ -1415,17 +1487,22 @@
                     };
                     return onDrag;
                 };
+                
                 container.addEventListener('mousedown', e => {
+                    container.isDragging = true;
                     const onDrag = onDragStart(e.clientX);
                     const onMouseMove = (moveEvent) => onDrag(moveEvent.clientX);
                     const onMouseUp = () => {
                         document.removeEventListener('mousemove', onMouseMove);
                         document.removeEventListener('mouseup', onMouseUp);
+                        container.isDragging = false;
                     };
                     document.addEventListener('mousemove', onMouseMove);
                     document.addEventListener('mouseup', onMouseUp);
                 });
+                
                 container.addEventListener('touchstart', e => {
+                    container.isDragging = true;
                     const touch = e.changedTouches[0];
                     const touchId = touch.identifier;
                     const onDrag = onDragStart(touch.clientX);
@@ -1438,6 +1515,7 @@
                             if (t.identifier === touchId) {
                                 document.removeEventListener('touchmove', onTouchMove);
                                 document.removeEventListener('touchend', onTouchEnd);
+                                container.isDragging = false;
                             }
                         }
                     };
@@ -1448,9 +1526,11 @@
                 }, {
                     passive: false
                 });
+                
                 container.addEventListener('dblclick', () => {
                     container.setValue(parseFloat(container.dataset.defaultValue));
                 });
+                
                 container.setValue(value);
             });
         }
@@ -1589,6 +1669,7 @@
             };
             container.addEventListener('scroll', updateThumb);
             new ResizeObserver(updateThumb).observe(container);
+            
             const onDragStart = (startY) => {
                 const initialScrollTop = container.scrollTop;
                 const trackHeight = scrollbar.clientHeight;
@@ -1601,6 +1682,7 @@
                 };
                 return onDrag;
             };
+            
             thumb.addEventListener('mousedown', e => {
                 e.stopPropagation();
                 const onDrag = onDragStart(e.clientY);
@@ -1612,14 +1694,17 @@
                 document.addEventListener('mousemove', onMouseMove);
                 document.addEventListener('mouseup', onMouseUp);
             });
+            
             thumb.addEventListener('touchstart', e => {
                 e.stopPropagation();
+                e.preventDefault(); 
                 const touch = e.changedTouches[0];
                 const touchId = touch.identifier;
                 const onDrag = onDragStart(touch.clientY);
                 const onTouchMove = (moveEvent) => {
+                    moveEvent.preventDefault(); 
                     for (const t of moveEvent.changedTouches)
-                        if (t.identifier === touchId) onDrag(t.clientX);
+                        if (t.identifier === touchId) onDrag(t.clientY); 
                 };
                 const onTouchEnd = (endEvent) => {
                     for (const t of endEvent.changedTouches) {
@@ -1662,11 +1747,18 @@
             }
             const loopDuration = (audioBuffer.duration * cropRange) / autoplayState.speed;
             let progressInLoop = (elapsedTime % loopDuration) / loopDuration;
-            if (autoplayState.direction) { // RTL
+            
+            const seekKnob = document.querySelector('.knob-container[data-id="autoplay-seek"]');
+            if (seekKnob && !seekKnob.isDragging) {
+                seekKnob.setValue(progressInLoop * 100, false);
+            }
+
+            if (autoplayState.direction) { 
                 progressInLoop = 1 - progressInLoop;
             }
             const playheadPosition = autoplayState.cropStart + (progressInLoop * cropRange);
             granularNode.parameters.get('playhead').setTargetAtTime(playheadPosition, audioContext.currentTime, 0.01);
+            
             const rect = canvas.getBoundingClientRect();
             const x = playheadPosition * rect.width;
             const y = (1 - autoplayState.verticalPos) * rect.height;
@@ -1674,8 +1766,10 @@
             const minFreq = 40;
             const maxFreq = 20000;
             const logFreq = minFreq * Math.pow(maxFreq / minFreq, normalizedY);
+            
             if (filterNode) filterNode.frequency.setTargetAtTime(logFreq, audioContext.currentTime, 0.01);
             updatePlayIndicator(x, y);
+            
             autoplayState.frameId = requestAnimationFrame(autoplayLoop);
         }
 
@@ -1691,7 +1785,7 @@
             audioContext.resume();
             
             const inputGainKnob = document.querySelector('.knob-container[data-id="input-gain"]');
-            const baseGain = inputGainKnob ? parseFloat(inputGainKnob.dataset.value) : 1.0;
+            const baseGain = inputGainKnob ? parseFloat(inputGainKnob.dataset.value) / 50.0 : 1.0;
             if (effects.inputGain) {
                 effects.inputGain.gain.setValueAtTime(baseGain, audioContext.currentTime);
             }
