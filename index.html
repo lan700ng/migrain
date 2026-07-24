@@ -381,12 +381,14 @@
             width: 2px;
             height: 120px;
             top: 0;
+            z-index: 10;
         }
 
         #play-indicator-h {
             height: 2px;
             width: 100%;
             left: 0;
+            z-index: 10;
         }
 
         #instructions {
@@ -709,6 +711,10 @@
                         </div>
                     </div>
                     <div class="effect-controls">
+                        <div class="control" title="0: Triangle, 1: Sine, 2: Sawtooth, 3: Rev Sawtooth, 4: Square">
+                            <label>Shape</label>
+                            <div class="knob-container" data-id="grain-shape" data-min="0" data-max="4" data-value="0" data-step="1"></div>
+                        </div>
                         <div class="control">
                             <label>Size</label>
                             <div class="knob-container" data-id="grain-size" data-min="10" data-max="500" data-value="100"></div>
@@ -719,15 +725,15 @@
                         </div>
                         <div class="control">
                             <label>Pitch</label>
-                            <div class="knob-container" data-id="pitch" data-min="0.1" data-max="4.0" data-value="1.0" data-step="0.01"></div>
+                            <div class="knob-container" data-id="pitch" data-min="0.1" data-max="100.0" data-value="50.0" data-step="0.1"></div>
                         </div>
                         <div class="control">
                             <label>Pitch Jitter</label>
-                            <div class="knob-container" data-id="pitch-jitter" data-min="0" data-max="1" data-value="0" data-step="0.01"></div>
+                            <div class="knob-container" data-id="pitch-jitter" data-min="0" data-max="100.0" data-value="0" data-step="0.1"></div>
                         </div>
                         <div class="control">
                             <label>Grain Jitter</label>
-                            <div class="knob-container" data-id="grain-jitter" data-min="0" data-max="1000" data-value="0" data-step="1"></div>
+                            <div class="knob-container" data-id="grain-jitter" data-min="0" data-max="100.0" data-value="0" data-step="0.1"></div>
                         </div>
                         <div class="control">
                             <label>Pan Jitter</label>
@@ -815,9 +821,11 @@
             startTime: 0,
             frameId: null
         };
+        
         const autoplayBtn = document.getElementById('autoplay-btn');
         const cropOverlayStart = document.getElementById('crop-overlay-start');
         const cropOverlayEnd = document.getElementById('crop-overlay-end');
+        
         const granularProcessorCode = `
             class GranularProcessor extends AudioWorkletProcessor {
                 constructor() {
@@ -844,14 +852,15 @@
                         { name: 'playhead', defaultValue: 0, minValue: 0, maxValue: 1 },
                         { name: 'grainSize', defaultValue: 100, minValue: 10, maxValue: 500 },
                         { name: 'grainDensity', defaultValue: 20, minValue: 1, maxValue: 100 },
-                        { name: 'pitch', defaultValue: 1.0, minValue: 0.1, maxValue: 4.0 },
-                        { name: 'pitchJitter', defaultValue: 0, minValue: 0, maxValue: 1 },
-                        { name: 'grainJitter', defaultValue: 0, minValue: 0, maxValue: 1000 },
+                        { name: 'pitch', defaultValue: 50.0, minValue: 0.1, maxValue: 100.0 },
+                        { name: 'pitchJitter', defaultValue: 0.0, minValue: 0, maxValue: 100.0 },
+                        { name: 'grainJitter', defaultValue: 0.0, minValue: 0, maxValue: 100.0 },
                         { name: 'spread', defaultValue: 0.1, minValue: 0, maxValue: 1 },
                         { name: 'pitchSync', defaultValue: 0, minValue: 0, maxValue: 1 },
                         { name: 'reverseChance', defaultValue: 0, minValue: 0, maxValue: 1 },
                         { name: 'noiseAmount', defaultValue: 0, minValue: 0, maxValue: 1.0 },
-                        { name: 'noiseType', defaultValue: 0, minValue: 0, maxValue: 2 }
+                        { name: 'noiseType', defaultValue: 0, minValue: 0, maxValue: 2 },
+                        { name: 'grainShape', defaultValue: 0, minValue: 0, maxValue: 4 }
                     ];
                 }
 
@@ -873,44 +882,56 @@
 
                     if (currentTime > this._lastGrainTime + Math.max(0.001, grainInterval)) {
                         this._lastGrainTime = currentTime;
-                        const grainSize = parameters.grainSize[0] / 1000;
-                        const grainSizeSamples = Math.round(grainSize * sampleRate);
-                        const bufferLength = this._buffers[0].length;
                         
-                        const jitterAmount = (Math.random() * 2 - 1) * (parameters.grainJitter[0] / 10000.0) * bufferLength;
-                        let startPosition = Math.floor(parameters.playhead[0] * bufferLength + jitterAmount);
-                        startPosition = Math.max(0, Math.min(startPosition, bufferLength - grainSizeSamples));
-                        
-                        const grainBuffers = this._buffers.map(channelBuffer => 
-                            channelBuffer.subarray(startPosition, startPosition + grainSizeSamples)
-                        );
-                        
-                        const pitchRand = (Math.random() * 2 - 1) * parameters.pitchJitter[0];
-                        const finalPitch = parameters.pitch[0] + pitchRand;
-                        const isPitchSynced = parameters.pitchSync[0] > 0.5;
+                        // Prevent overloading CPU with too many concurrent grains
+                        if (this.grains.length < 150) {
+                            const grainSize = parameters.grainSize[0] / 1000;
+                            const grainSizeSamples = Math.round(grainSize * sampleRate);
+                            const bufferLength = this._buffers[0].length;
+                            
+                            const jitterAmount = (Math.random() * 2 - 1) * (parameters.grainJitter[0] / 100.0) * bufferLength;
+                            let startPosition = Math.floor(parameters.playhead[0] * bufferLength + jitterAmount);
+                            startPosition = Math.max(0, Math.min(startPosition, bufferLength - grainSizeSamples));
+                            
+                            const grainBuffers = this._buffers.map(channelBuffer => 
+                                channelBuffer.subarray(startPosition, startPosition + grainSizeSamples)
+                            );
+                            
+                            // 50% pitch == 1.0x (normal speed)
+                            const basePitch = parameters.pitch[0] / 50.0;
+                            const pitchRand = (Math.random() * 2 - 1) * (parameters.pitchJitter[0] / 50.0);
+                            
+                            // Limit low pitch so duration doesn't go to infinity
+                            const finalPitch = Math.max(0.01, basePitch + pitchRand);
+                            const isPitchSynced = parameters.pitchSync[0] > 0.5;
 
-                        let totalDurationSamples;
-                        if (isPitchSynced) {
-                            totalDurationSamples = grainSizeSamples;
-                        } else {
-                            totalDurationSamples = Math.floor(grainSizeSamples / finalPitch);
+                            let totalDurationSamples;
+                            if (isPitchSynced) {
+                                totalDurationSamples = grainSizeSamples;
+                            } else {
+                                totalDurationSamples = Math.floor(grainSizeSamples / finalPitch);
+                            }
+                            
+                            // Hard cap duration at 5 seconds to prevent unbounded array loops
+                            totalDurationSamples = Math.min(totalDurationSamples, sampleRate * 5);
+
+                            const finalPan = (Math.random() * 2 - 1) * parameters.spread[0];
+
+                            this.grains.push({
+                                buffers: grainBuffers,
+                                playbackPosition: 0,
+                                pitch: finalPitch,
+                                totalDurationSamples: totalDurationSamples,
+                                pan: finalPan,
+                                direction: Math.random() < parameters.reverseChance[0] ? -1 : 1,
+                                isPitchSynced: isPitchSynced
+                            });
                         }
-
-                        const finalPan = (Math.random() * 2 - 1) * parameters.spread[0];
-
-                        this.grains.push({
-                            buffers: grainBuffers,
-                            playbackPosition: 0,
-                            pitch: finalPitch,
-                            totalDurationSamples: totalDurationSamples,
-                            pan: finalPan,
-                            direction: Math.random() < parameters.reverseChance[0] ? -1 : 1,
-                            isPitchSynced: isPitchSynced
-                        });
                     }
 
                     const noiseAmount = parameters.noiseAmount[0];
                     const noiseType = Math.round(parameters.noiseType[0]);
+                    const shapeType = Math.round(parameters.grainShape[0] || 0);
 
                     for (let i = 0; i < outputLength; i++) {
                         let leftSample = 0;
@@ -922,10 +943,10 @@
                         const whiteL = Math.random() * 2 - 1;
                         const whiteR = Math.random() * 2 - 1;
 
-                        if (noiseType === 0) { // White
+                        if (noiseType === 0) { 
                             noiseL = whiteL;
                             noiseR = whiteR;
-                        } else if (noiseType === 1) { // Pink
+                        } else if (noiseType === 1) { 
                             this._pinkB_L[0] = 0.99886 * this._pinkB_L[0] + whiteL * 0.0555179;
                             this._pinkB_L[1] = 0.99332 * this._pinkB_L[1] + whiteL * 0.0750759;
                             this._pinkB_L[2] = 0.96900 * this._pinkB_L[2] + whiteL * 0.1538520;
@@ -945,7 +966,7 @@
                             noiseR = this._pinkB_R[0] + this._pinkB_R[1] + this._pinkB_R[2] + this._pinkB_R[3] + this._pinkB_R[4] + this._pinkB_R[5] + this._pinkB_R[6] + whiteR * 0.5362;
                             this._pinkB_R[6] = whiteR * 0.115926;
                             noiseR /= 5.0;
-                        } else { // Brown
+                        } else { 
                             this._brownLastOut_L = (this._brownLastOut_L + (0.02 * whiteL)) / 1.02;
                             this._brownLastOut_R = (this._brownLastOut_R + (0.02 * whiteR)) / 1.02;
                             noiseL = this._brownLastOut_L * 3.5;
@@ -956,7 +977,20 @@
                         for (const grain of this.grains) {
                             const progress = grain.playbackPosition / grain.totalDurationSamples;
                             if (progress >= 0 && progress < 1) {
-                                const envelope = 1 - Math.abs(2 * progress - 1);
+                                let envelope = 1;
+                                if (shapeType === 0) { 
+                                    envelope = 1 - Math.abs(2 * progress - 1);
+                                } else if (shapeType === 1) { 
+                                    envelope = 0.5 * (1 - Math.cos(2 * Math.PI * progress));
+                                } else if (shapeType === 2) { 
+                                    envelope = 1 - progress;
+                                } else if (shapeType === 3) { 
+                                    envelope = progress;
+                                } else if (shapeType === 4) { 
+                                    if (progress < 0.05) envelope = progress / 0.05;
+                                    else if (progress > 0.95) envelope = (1 - progress) / 0.05;
+                                    else envelope = 1;
+                                }
                                 
                                 let readPosition;
                                 if (grain.direction === 1) {
@@ -1075,7 +1109,10 @@
             const minFreq = 40;
             const maxFreq = 20000;
             const logFreq = minFreq * Math.pow(maxFreq / minFreq, normalizedY);
-            if (filterNode) filterNode.frequency.setTargetAtTime(logFreq, audioContext.currentTime, 0.01);
+            
+            filterNode.frequency.cancelScheduledValues(audioContext.currentTime);
+            filterNode.frequency.setTargetAtTime(logFreq, audioContext.currentTime, 0.01);
+            
             updatePlayIndicator(x, y);
         }
 
@@ -1183,6 +1220,7 @@
         function updateAudioParameter(id, value) {
             if (!granularNode) return;
             const paramName = id.replace(/-./g, x => x[1].toUpperCase());
+            
             if (paramName === 'inputGain') {
                 effects.inputGain.gain.setTargetAtTime(value / 50.0, audioContext.currentTime, 0.01);
             } else if (paramName === 'envAttack') {
@@ -1455,7 +1493,10 @@
                             decimals = step.split('.')[1].length;
                         }
                         let displayStr = value.toFixed(decimals);
-                        if (id === 'input-gain' || id === 'autoplay-seek') displayStr += '%';
+                        
+                        if (id === 'input-gain' || id === 'autoplay-seek' || id === 'pitch' || id === 'pitch-jitter' || id === 'grain-jitter') {
+                            displayStr += '%';
+                        }
                         
                         if (valueDisplay.textContent !== displayStr) {
                             valueDisplay.textContent = displayStr;
@@ -1767,7 +1808,10 @@
             const maxFreq = 20000;
             const logFreq = minFreq * Math.pow(maxFreq / minFreq, normalizedY);
             
-            if (filterNode) filterNode.frequency.setTargetAtTime(logFreq, audioContext.currentTime, 0.01);
+            if (filterNode) {
+                filterNode.frequency.cancelScheduledValues(audioContext.currentTime);
+                filterNode.frequency.setTargetAtTime(logFreq, audioContext.currentTime, 0.01);
+            }
             updatePlayIndicator(x, y);
             
             autoplayState.frameId = requestAnimationFrame(autoplayLoop);
@@ -1787,6 +1831,7 @@
             const inputGainKnob = document.querySelector('.knob-container[data-id="input-gain"]');
             const baseGain = inputGainKnob ? parseFloat(inputGainKnob.dataset.value) / 50.0 : 1.0;
             if (effects.inputGain) {
+                effects.inputGain.gain.cancelScheduledValues(audioContext.currentTime);
                 effects.inputGain.gain.setValueAtTime(baseGain, audioContext.currentTime);
             }
             
@@ -1932,7 +1977,6 @@
                 passive: false
             });
         }
-
 
         window.onload = () => {
             loadLayout();
