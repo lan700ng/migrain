@@ -351,6 +351,16 @@
             display: block;
         }
 
+        #analyzer-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            pointer-events: none;
+            z-index: 4;
+        }
+
         .crop-overlay {
             position: absolute;
             top: 0;
@@ -591,6 +601,7 @@
             <div class="drag-handle">𑁋</div>
             <div id="canvas-wrapper">
                 <canvas id="waveform-canvas"></canvas>
+                <canvas id="analyzer-canvas"></canvas>
                 <div id="crop-overlay-start" class="crop-overlay"></div>
                 <div id="crop-overlay-end" class="crop-overlay"></div>
                 <div id="play-indicator-v"></div>
@@ -653,6 +664,14 @@
                         <div class="control">
                             <label>Filter Q</label>
                             <div class="knob-container" data-id="preview-filter-q" data-min="0.0001" data-max="30" data-value="1" data-step="0.01"></div>
+                        </div>
+                        <div class="control" title="1: Frequency, 2: Time, 3: None">
+                            <label>Analyzer</label>
+                            <div class="knob-container" data-id="analyzer-mode" data-min="1" data-max="3" data-value="1" data-step="1"></div>
+                        </div>
+                        <div class="control" title="1: Linear, 2: Logarithmic">
+                            <label>Freq Scale</label>
+                            <div class="knob-container" data-id="analyzer-scale" data-min="1" data-max="2" data-value="2" data-step="1"></div>
                         </div>
                         <div class="control">
                             <label>Attack</label>
@@ -791,16 +810,24 @@
         let granularNode = null;
         let filterNode = null;
         let pannerNode = null;
+        let analyserNode = null;
+        let analyzerDataArray = null;
+        let currentAnalyzerMode = 1; // 1: Freq, 2: Time, 3: None
+        let currentAnalyzerScale = 2; // 1: Lin, 2: Log
+        
         let isPlaying = false;
         let activeCanvasTouchId = null;
         const fileUpload = document.getElementById('audio-upload');
         const canvas = document.getElementById('waveform-canvas');
         const ctx = canvas.getContext('2d');
+        const analyzerCanvas = document.getElementById('analyzer-canvas');
+        const analyzerCtx = analyzerCanvas.getContext('2d');
         const playIndicatorV = document.getElementById('play-indicator-v');
         const playIndicatorH = document.getElementById('play-indicator-h');
         const instructions = document.getElementById('instructions');
         const resetBtn = document.getElementById('reset-btn');
         const recordBtn = document.getElementById('record-btn');
+        
         let isRecording = false;
         let recorderNode = null;
         let recordedData = [];
@@ -821,11 +848,16 @@
             startTime: 0,
             frameId: null
         };
+        let cachedRecordColor = '#ff7b72';
         
         const autoplayBtn = document.getElementById('autoplay-btn');
         const cropOverlayStart = document.getElementById('crop-overlay-start');
         const cropOverlayEnd = document.getElementById('crop-overlay-end');
         
+        function updateCachedColors() {
+            cachedRecordColor = getComputedStyle(document.body).getPropertyValue('--record').trim() || '#ff7b72';
+        }
+
         const granularProcessorCode = `
             class GranularProcessor extends AudioWorkletProcessor {
                 constructor() {
@@ -883,7 +915,6 @@
                     if (currentTime > this._lastGrainTime + Math.max(0.001, grainInterval)) {
                         this._lastGrainTime = currentTime;
                         
-                        // Prevent overloading CPU with too many concurrent grains
                         if (this.grains.length < 150) {
                             const grainSize = parameters.grainSize[0] / 1000;
                             const grainSizeSamples = Math.round(grainSize * sampleRate);
@@ -897,11 +928,9 @@
                                 channelBuffer.subarray(startPosition, startPosition + grainSizeSamples)
                             );
                             
-                            // 50% pitch == 1.0x (normal speed)
                             const basePitch = parameters.pitch[0] / 50.0;
                             const pitchRand = (Math.random() * 2 - 1) * (parameters.pitchJitter[0] / 50.0);
                             
-                            // Limit low pitch so duration doesn't go to infinity
                             const finalPitch = Math.max(0.01, basePitch + pitchRand);
                             const isPitchSynced = parameters.pitchSync[0] > 0.5;
 
@@ -912,7 +941,6 @@
                                 totalDurationSamples = Math.floor(grainSizeSamples / finalPitch);
                             }
                             
-                            // Hard cap duration at 5 seconds to prevent unbounded array loops
                             totalDurationSamples = Math.min(totalDurationSamples, sampleRate * 5);
 
                             const finalPan = (Math.random() * 2 - 1) * parameters.spread[0];
@@ -1056,13 +1084,22 @@
                 granularNode = new AudioWorkletNode(audioContext, 'granular-processor', {
                     outputChannelCount: [2]
                 });
+                
+                analyserNode = audioContext.createAnalyser();
+                analyserNode.fftSize = 4096;
+                analyzerDataArray = new Uint8Array(analyserNode.frequencyBinCount);
+                
                 effects.inputGain = audioContext.createGain();
                 filterNode = audioContext.createBiquadFilter();
                 pannerNode = audioContext.createStereoPanner();
+                
                 const chain = [granularNode, effects.inputGain, filterNode, pannerNode];
                 effects.masterGain = audioContext.createGain();
+                
                 chain.push(effects.masterGain);
+                chain.push(analyserNode);
                 chain.push(audioContext.destination);
+                
                 for (let i = 0; i < chain.length - 1; i++) {
                     chain[i].connect(chain[i + 1]);
                 }
@@ -1142,7 +1179,7 @@
         }
 
         function startPlayingMouse(e) {
-            if (e.target !== canvas || !audioBuffer) return;
+            if (e.target !== canvas && e.target !== analyzerCanvas || !audioBuffer) return;
             if (autoplayState.isPlaying) stopAutoplay();
             audioContext.resume();
             startNoteADSR();
@@ -1150,7 +1187,7 @@
         }
 
         function handleCanvasTouchStart(e) {
-            if (e.target !== canvas || !audioBuffer) return;
+            if (e.target !== canvas && e.target !== analyzerCanvas || !audioBuffer) return;
             if (autoplayState.isPlaying) stopAutoplay();
             e.preventDefault();
             const soundControlTouch = e.changedTouches[0];
@@ -1206,21 +1243,22 @@
         }
 
         canvas.addEventListener('mousedown', startPlayingMouse);
-        canvas.addEventListener('mousemove', (e) => isPlaying && activeCanvasTouchId === null && handleInteraction(e));
-        canvas.addEventListener('mouseup', stopPlaying);
-        canvas.addEventListener('mouseleave', stopPlaying);
-        canvas.addEventListener('touchstart', handleCanvasTouchStart, {
-            passive: false
-        });
-        canvas.addEventListener('touchmove', handleCanvasTouchMove, {
-            passive: false
-        });
+        window.addEventListener('mousemove', (e) => isPlaying && activeCanvasTouchId === null && handleInteraction(e));
+        window.addEventListener('mouseup', stopPlaying);
+        
+        analyzerCanvas.addEventListener('mousedown', startPlayingMouse);
+        analyzerCanvas.addEventListener('touchstart', handleCanvasTouchStart, { passive: false });
+        analyzerCanvas.addEventListener('touchmove', handleCanvasTouchMove, { passive: false });
+        analyzerCanvas.addEventListener('touchend', handleCanvasTouchEnd);
+
+        canvas.addEventListener('touchstart', handleCanvasTouchStart, { passive: false });
+        canvas.addEventListener('touchmove', handleCanvasTouchMove, { passive: false });
         canvas.addEventListener('touchend', handleCanvasTouchEnd);
 
         function updateAudioParameter(id, value) {
             if (!granularNode) return;
             const paramName = id.replace(/-./g, x => x[1].toUpperCase());
-            
+
             if (paramName === 'inputGain') {
                 effects.inputGain.gain.setTargetAtTime(value / 50.0, audioContext.currentTime, 0.01);
             } else if (paramName === 'envAttack') {
@@ -1236,6 +1274,10 @@
                 if (filterNode) filterNode.type = types[Math.round(value)];
             } else if (paramName === 'previewFilterQ') {
                 if (filterNode) filterNode.Q.setTargetAtTime(value, audioContext.currentTime, 0.01);
+            } else if (paramName === 'analyzerMode') {
+                currentAnalyzerMode = Math.round(value);
+            } else if (paramName === 'analyzerScale') {
+                currentAnalyzerScale = Math.round(value);
             } else if (paramName === 'autoplayCropStart') {
                 autoplayState.cropStart = value;
                 updateCropOverlays();
@@ -1295,6 +1337,91 @@
                 ctx.lineTo(i, (1 + max) * amp);
             }
             ctx.stroke();
+        }
+        
+        function drawAnalyzer() {
+            requestAnimationFrame(drawAnalyzer);
+            
+            const width = analyzerCanvas.width / (window.devicePixelRatio || 1);
+            const height = analyzerCanvas.height / (window.devicePixelRatio || 1);
+            
+            analyzerCtx.clearRect(0, 0, width, height);
+            
+            if (currentAnalyzerMode === 3 || !analyserNode) return;
+            
+            analyzerCtx.lineWidth = 2;
+            analyzerCtx.strokeStyle = cachedRecordColor;
+            analyzerCtx.fillStyle = cachedRecordColor;
+            
+            if (currentAnalyzerMode === 1) {
+                analyserNode.getByteFrequencyData(analyzerDataArray);
+                analyzerCtx.beginPath();
+                
+                if (currentAnalyzerScale === 2) { 
+                    const minFreq = 20;
+                    const maxFreq = audioContext.sampleRate ? (audioContext.sampleRate / 2) : 22050;
+                    const minLog = Math.log10(minFreq);
+                    const maxLog = Math.log10(maxFreq);
+                    
+                    analyzerCtx.moveTo(0, height);
+                    
+                    let firstPoint = true;
+                    for (let i = 1; i < analyzerDataArray.length; i++) {
+                        const freq = i * maxFreq / analyzerDataArray.length;
+                        if (freq < minFreq) continue;
+                        
+                        let x = width * (Math.log10(freq) - minLog) / (maxLog - minLog);
+                        if (x < 0) x = 0;
+                        if (x > width) x = width;
+                        
+                        const v = analyzerDataArray[i] / 255.0;
+                        const y = height - (v * height);
+                        
+                        if (firstPoint) {
+                            analyzerCtx.lineTo(x, height); 
+                            analyzerCtx.lineTo(x, y);
+                            firstPoint = false;
+                        } else {
+                            analyzerCtx.lineTo(x, y);
+                        }
+                    }
+                    analyzerCtx.lineTo(width, height);
+                } else {
+                    const sliceWidth = width / analyzerDataArray.length;
+                    let x = 0;
+                    
+                    analyzerCtx.moveTo(0, height);
+                    for (let i = 0; i < analyzerDataArray.length; i++) {
+                        const v = analyzerDataArray[i] / 255.0;
+                        const y = height - (v * height);
+                        analyzerCtx.lineTo(x, y);
+                        x += sliceWidth;
+                    }
+                    analyzerCtx.lineTo(width, height);
+                }
+                
+                analyzerCtx.globalAlpha = 0.4;
+                analyzerCtx.fill();
+                analyzerCtx.globalAlpha = 1.0;
+                analyzerCtx.stroke();
+                
+            } else if (currentAnalyzerMode === 2) {
+                analyserNode.getByteTimeDomainData(analyzerDataArray);
+                const sliceWidth = width / analyzerDataArray.length;
+                let x = 0;
+                
+                analyzerCtx.beginPath();
+                for (let i = 0; i < analyzerDataArray.length; i++) {
+                    const v = analyzerDataArray[i] / 128.0;
+                    const y = v * height / 2;
+                    if (i === 0) analyzerCtx.moveTo(x, y);
+                    else analyzerCtx.lineTo(x, y);
+                    x += sliceWidth;
+                }
+                analyzerCtx.globalAlpha = 0.7;
+                analyzerCtx.stroke();
+                analyzerCtx.globalAlpha = 1.0;
+            }
         }
 
         function updatePlayIndicator(x, y) {
@@ -1413,6 +1540,7 @@
                     btn.classList.add('active');
                     const palette = btn.dataset.palette;
                     document.body.setAttribute('data-palette', palette);
+                    updateCachedColors();
                     if (audioBuffer) drawWaveform(audioBuffer);
                 });
             });
@@ -1435,6 +1563,7 @@
                 if(b.dataset.palette === 'github-dark') b.classList.add('active');
                 else b.classList.remove('active');
             });
+            updateCachedColors();
             if (audioBuffer) drawWaveform(audioBuffer);
         });
 
@@ -1445,7 +1574,7 @@
                 let value = parseFloat(container.dataset.value);
                 container.dataset.defaultValue = value;
                 const id = container.dataset.id;
-                
+
                 const controlDiv = container.closest('.control');
                 const valueDisplay = document.createElement('div');
                 valueDisplay.className = 'knob-value-display';
@@ -1982,9 +2111,16 @@
             loadLayout();
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.getBoundingClientRect();
+            
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
             ctx.scale(dpr, dpr);
+            
+            analyzerCanvas.width = rect.width * dpr;
+            analyzerCanvas.height = rect.height * dpr;
+            analyzerCtx.scale(dpr, dpr);
+            
+            updateCachedColors();
             setupAudioChain();
             setupKnobs();
             setupSquareSliders();
@@ -1992,6 +2128,7 @@
             setupCustomScrollbar();
             setupDraggablePanels();
             updateCropOverlays();
+            drawAnalyzer();
         };
     </script>
 </body>
